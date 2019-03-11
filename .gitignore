@@ -1,0 +1,6 @@
+/dist/
+
+node_modules/
+yarn.lock
+npm-debug.log
+yarn-error.log

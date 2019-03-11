@@ -1,0 +1,13 @@
+{
+  "extends": "eslint-config-airbnb-base",
+  "rules": {
+    "indent": ["error", 4, { "SwitchCase": 1 }],
+    "max-len": ["off"],
+    "no-param-reassign": ["off"],
+    "no-use-before-define": ["off"],
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
+  },
+  "env": {
+    "browser": true
+  }
+}

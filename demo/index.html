@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+    <title>vue-inline-svg</title>
+
+    <script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+    <script src="./index.js" type="module"></script>
+</head>
+<body>
+<div id="app">
+    <div>
+        <div>
+            <inline-svg v-bind:src="`./img/${currentIcon}.svg`" width="150" height="150"></inline-svg>
+            <inline-svg v-bind:src="`./img/${currentIcon}.svg`" v-bind:width="currentSize" v-bind:height="currentSize"></inline-svg>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="icon" value="firefox" v-model="currentIcon">
+                Firefox
+            </label>
+            <label>
+                <input type="radio" name="icon" value="safari" v-model="currentIcon">
+                Safari
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="size" value="150" v-model="currentSize">
+                150
+            </label>
+            <label>
+                <input type="radio" name="size" value="100" v-model="currentSize">
+                100
+            </label>
+        </div>
+    </div>
+</div>
+</body>
+</html>
