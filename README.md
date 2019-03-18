@@ -85,7 +85,7 @@ new Vue({
 #### src
 path to SVG file
 
-Other attributes will be passed to inlined `<svg>`
+Other attributes will be passed to inlined `<svg>`. Except attributes with `false` or `null` value.
 
 ### events
 #### loaded
@@ -99,7 +99,7 @@ called when svg failed to load
 
 ## Comparison
 
-- This module: **1.3 kB minified**
+- This module: **1.5 kB minified**
 - [`vue-simple-svg`](https://github.com/seiyable/vue-simple-svg): 21KB minified, does not cache network requests, has wrapper around svg, attrs passed to `<svg>` are limited, converts `<style>` tag into `style=""` attr
 
 

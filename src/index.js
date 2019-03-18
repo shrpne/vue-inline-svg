@@ -1,6 +1,19 @@
 /** @type Object{string: Promise<Element>} */
 const cache = {};
 
+/**
+ * Remove false attrs
+ * @param {Object} attrs
+ */
+function filterAttrs(attrs) {
+    return Object.keys(attrs).reduce((result, key) => {
+        if (attrs[key] !== false && attrs[key] !== null && attrs[key] !== undefined) {
+            result[key] = attrs[key];
+        }
+        return result;
+    }, {});
+}
+
 
 const InlineSvgComponent = {
     name: 'inline-svg',
@@ -11,7 +24,7 @@ const InlineSvgComponent = {
         return createElement(
             'svg',
             {
-                attrs: Object.assign(this.svgAttrs, this.$vnode.data.attrs),
+                attrs: Object.assign(this.svgAttrs, filterAttrs(this.$vnode.data.attrs)),
             },
         );
     },
