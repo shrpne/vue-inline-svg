@@ -35,6 +35,10 @@ const InlineSvgComponent = {
             type: String,
             required: true,
         },
+        transformSource: {
+            type: Function,
+            default: (svg) => svg,
+        },
     },
     data() {
         return {
@@ -104,11 +108,11 @@ const InlineSvgComponent = {
                 const request = new XMLHttpRequest();
                 request.open('GET', url, true);
 
-                request.onload = function requestOnload() {
+                request.onload = () => {
                     if (request.status >= 200 && request.status < 400) {
                         // Setup a parser to convert the response to text/xml in order for it to be manipulated and changed
                         const parser = new DOMParser();
-                        const result = parser.parseFromString(request.responseText, 'text/xml');
+                        const result = parser.parseFromString(this.transformSource(request.responseText), 'text/xml');
                         const svgEl = result.getElementsByTagName('svg')[0];
                         resolve(svgEl);
                     } else {
