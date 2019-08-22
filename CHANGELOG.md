@@ -1,3 +1,6 @@
+## 1.1.2 - 2019-08-22
+- Fixed: now listeners correctly passes [#4](https://github.com/shrpne/vue-inline-svg/pull/4)
+
 ## 1.1.1 - 2019-03-18
 - Fixed: don't use Vue's merge attrs logic
 

@@ -1,7 +1,7 @@
 import InlineSvg from '../src/index.js';
 
 new Vue({
-    el: "#app",
+    el: '#app',
     components: {
         InlineSvg,
     },
@@ -9,9 +9,14 @@ new Vue({
         return {
             currentIcon: 'firefox',
             currentSize: '150',
-        }
+        };
     },
-    render: function (createElement) {
+    methods: {
+        logClick() {
+            console.log('click');
+        },
+    },
+    render(createElement) {
         let self = this;
         return createElement('div', [
             createElement('div', [
@@ -20,14 +25,17 @@ new Vue({
                         src: `./img/${self.currentIcon}.svg`,
                         width: 150,
                         height: 150,
-                    }
+                    },
+                    on: {
+                        click: this.logClick,
+                    },
                 }),
                 createElement(InlineSvg, {
                     attrs: {
                         src: `./img/${self.currentIcon}.svg`,
                         width: self.currentSize,
                         height: self.currentSize,
-                    }
+                    },
                 }),
             ]),
             createElement('div', [
@@ -57,13 +65,11 @@ new Vue({
                     on: {
                         input: (event) => {
                             self[dataName] = event.target.value;
-                        }
-                    }
+                        },
+                    },
                 }),
                 value.toString(),
-            ])
+            ]);
         }
-    }
+    },
 });
-
-
