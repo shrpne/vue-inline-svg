@@ -25,7 +25,7 @@ const InlineSvgComponent = {
         return createElement(
             'svg',
             {
-            	on: this.$listeners,
+                on: this.$listeners,
                 attrs: Object.assign(this.svgAttrs, filterAttrs(this.$vnode.data.attrs)),
             },
         );
