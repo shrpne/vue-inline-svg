@@ -14,6 +14,7 @@
         <div>
             <inline-svg v-bind:src="`./img/${currentIcon}.svg`" width="150" height="150" :fill="false" @click="logClick"></inline-svg>
             <inline-svg v-bind:src="`./img/${currentIcon}.svg`" v-bind:width="currentSize" v-bind:height="currentSize" :fill="''"></inline-svg>
+            <inline-svg src="./index.html" v-on:error="logError"></inline-svg>
         </div>
         <div>
             <label>

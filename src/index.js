@@ -26,7 +26,10 @@ const InlineSvgComponent = {
             'svg',
             {
                 on: this.$listeners,
-                attrs: Object.assign(this.svgAttrs, filterAttrs(this.$vnode.data.attrs)),
+                attrs: Object.assign(this.initialAttrs, filterAttrs(this.$attrs)),
+                domProps: {
+                    innerHTML: this.initialContent,
+                },
             },
         );
     },
@@ -39,18 +42,19 @@ const InlineSvgComponent = {
     data() {
         return {
             isLoaded: false,
-            svgAttrs: {},
+            initialAttrs: {},
+            initialContent: '',
         };
-    },
-    mounted() {
-        // generate inline svg
-        this.inline(this.src);
     },
     watch: {
         src(newValue) {
             // re-generate inline svg
             this.inline(newValue);
         },
+    },
+    mounted() {
+        // generate inline svg
+        this.inline(this.src);
     },
     methods: {
         /**
@@ -66,32 +70,30 @@ const InlineSvgComponent = {
                     this.$emit('unloaded');
                 }
                 // download
-                cache[src] = this.download(src)
-                    .catch(() => {
-                        // remove cached rejected promise so next image can try load again
-                        delete cache[src];
-                        this.$emit('error');
-                    });
+                cache[src] = this.download(src);
             }
 
             // inline svg when cached promise resolves
-            cache[src].then((svg) => {
-                // copy attrs
-                this.svgAttrs = {};
-                const attrs = svg.attributes;
-                for (let i = attrs.length - 1; i >= 0; i--) {
-                    this.svgAttrs[attrs[i].name] = attrs[i].value;
-                }
-                // render svg element
-                this.isLoaded = true;
-                // wait for render complete
-                this.$nextTick(() => {
+            cache[src]
+                .then((svg) => {
+                    // copy attrs
+                    this.initialAttrs = {};
+                    const attrs = svg.attributes;
+                    for (let i = attrs.length - 1; i >= 0; i--) {
+                        this.initialAttrs[attrs[i].name] = attrs[i].value;
+                    }
                     // copy inner html
-                    this.$el.innerHTML = svg.innerHTML;
+                    this.initialContent = svg.innerHTML;
+                    // render svg element
+                    this.isLoaded = true;
                     // notify
                     this.$emit('loaded');
+                })
+                .catch((err) => {
+                    // remove cached rejected promise so next image can try load again
+                    delete cache[src];
+                    this.$emit('error', err);
                 });
-            });
         },
 
         /**
@@ -106,23 +108,28 @@ const InlineSvgComponent = {
 
                 request.onload = function requestOnload() {
                     if (request.status >= 200 && request.status < 400) {
-                        // Setup a parser to convert the response to text/xml in order for it to be manipulated and changed
-                        const parser = new DOMParser();
-                        const result = parser.parseFromString(request.responseText, 'text/xml');
-                        const svgEl = result.getElementsByTagName('svg')[0];
-                        resolve(svgEl);
+                        try {
+                            // Setup a parser to convert the response to text/xml in order for it to be manipulated and changed
+                            const parser = new DOMParser();
+                            const result = parser.parseFromString(request.responseText, 'text/xml');
+                            const svgEl = result.getElementsByTagName('svg')[0];
+                            if (svgEl) {
+                                resolve(svgEl);
+                            } else {
+                                reject(new Error('Loaded file is not valid SVG"'));
+                            }
+                        } catch (e) {
+                            reject(e);
+                        }
                     } else {
-                        reject();
+                        reject(new Error('Error loading SVG'));
                     }
                 };
 
                 request.onerror = reject;
-
                 request.send();
             });
         },
-
-
     },
 };
 

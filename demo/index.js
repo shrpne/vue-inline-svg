@@ -16,5 +16,9 @@ new Vue({
         logClick() {
             console.log('click');
         },
+        logError(e) {
+            console.log('Error loading index.html');
+            console.log(e);
+        },
     },
 });

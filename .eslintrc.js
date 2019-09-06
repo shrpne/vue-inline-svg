@@ -1,4 +1,4 @@
-{
+module.exports = {
   "extends": "eslint-config-airbnb-base",
   "rules": {
     "indent": ["error", 4, { "SwitchCase": 1 }],
@@ -8,10 +8,11 @@
     "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }],
     // allow let
     "prefer-const": "off",
+    "prefer-destructuring": ["error", {"object": true, "array": false}],
     // allow extension in imports
     "import/extensions": "off",
   },
   "env": {
     "browser": true
   }
-}
+};
