@@ -108,8 +108,8 @@ called when svg failed to load
 
 ## Comparison
 
-- This module: **1.5 kB minified**
-- [`vue-simple-svg`](https://github.com/seiyable/vue-simple-svg): 21KB minified, does not cache network requests, has wrapper around svg, attrs passed to `<svg>` are limited, converts `<style>` tag into `style=""` attr
+- This module: [![Minified Size](https://img.shields.io/bundlephobia/min/vue-inline-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-inline-svg)
+- [`vue-simple-svg`](https://github.com/seiyable/vue-simple-svg): [![Minified Size](https://img.shields.io/bundlephobia/min/vue-simple-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-simple-svg), does not cache network requests, has wrapper around svg, attrs passed to `<svg>` are limited, converts `<style>` tag into `style=""` attr
 
 
 ## License
