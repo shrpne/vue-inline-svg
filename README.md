@@ -85,6 +85,15 @@ new Vue({
 #### src
 path to SVG file
 
+Note: if you use vue-loader assets or vue-cli, then paths like '../assets/my.svg' will not be handled by file-loader automatically like vue-cli do for `<img>` tag, so you will need to use it with `require`:
+```
+<inline-svg :src="require('../assets/my.svg')"/>
+```
+Learn more:
+- https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
+- https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
+
+### attributes
 Other attributes will be passed to inlined `<svg>`. Except attributes with `false` or `null` value.
 
 ### events
