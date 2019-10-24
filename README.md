@@ -79,7 +79,7 @@ new Vue({
     aria-label="My image"
 ></inline-svg>
 ``` 
-[Example](https://github.com/shrpne/vue-inlinse-svg/blob/master/demo/index.html)
+[Example](https://github.com/shrpne/vue-inline-svg/blob/master/demo/index.html)
 
 ### props
 #### src
