@@ -106,14 +106,15 @@ const InlineSvgComponent = {
                 const request = new XMLHttpRequest();
                 request.open('GET', url, true);
 
-                request.onload = function requestOnload() {
+                request.onload = () => {
                     if (request.status >= 200 && request.status < 400) {
                         try {
                             // Setup a parser to convert the response to text/xml in order for it to be manipulated and changed
                             const parser = new DOMParser();
                             const result = parser.parseFromString(request.responseText, 'text/xml');
-                            const svgEl = result.getElementsByTagName('svg')[0];
+                            let svgEl = result.getElementsByTagName('svg')[0];
                             if (svgEl) {
+                                svgEl = this.transformSource(svgEl);
                                 resolve(svgEl);
                             } else {
                                 reject(new Error('Loaded file is not valid SVG"'));
