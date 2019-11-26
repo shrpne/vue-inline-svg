@@ -38,6 +38,10 @@ const InlineSvgComponent = {
             type: String,
             required: true,
         },
+        transformSource: {
+            type: Function,
+            default: (svg) => svg,
+        },
     },
     data() {
         return {
