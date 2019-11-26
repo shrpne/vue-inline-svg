@@ -1,3 +1,6 @@
+## 1.2.0 - 2019-11-26
+- Add: `transformSource` prop [#9](https://github.com/shrpne/vue-inline-svg/pull/9)
+
 ## 1.1.3 - 2019-09-06
 - Fixed: don't fail on invalid SVG file parse
 - Fixed: update component attrs now correctly launch component rerender

@@ -70,6 +70,7 @@ new Vue({
 ```html
 <inline-svg 
     src="image.svg" 
+    transformSource="transformSvg"
     @loaded="svgLoaded()"
     @unloaded="svgUnloaded()"
     @error="svgLoadError()"
@@ -82,8 +83,8 @@ new Vue({
 [Example](https://github.com/shrpne/vue-inline-svg/blob/master/demo/index.html)
 
 ### props
-#### src
-path to SVG file
+#### - `src`
+Path to SVG file
 
 Note: if you use vue-loader assets or vue-cli, then paths like '../assets/my.svg' will not be handled by file-loader automatically like vue-cli do for `<img>` tag, so you will need to use it with `require`:
 ```
@@ -93,17 +94,38 @@ Learn more:
 - https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
 - https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
 
+#### - `transformSource`
+Function to transform SVG source
+ 
+This example create circle in svg:
+```
+<inline-svg :src="image.svg" :transformSource="transform"/>
+
+....
+
+const transform = (svg) => {
+    let point = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
+        point.setAttributeNS(null, 'cx', '20');
+        point.setAttributeNS(null, 'cy', '20');
+        point.setAttributeNS(null, 'r', '10');
+        point.setAttributeNS(null, 'fill', 'red');
+        svg.appendChild(point);
+    return svg;
+}
+// For cleaner syntax you could use https://github.com/svgdotjs/svg.js
+```
+
 ### attributes
 Other attributes will be passed to inlined `<svg>`. Except attributes with `false` or `null` value.
 
 ### events
-#### loaded
+#### - `loaded`
 called when <svg> image is loaded and inlined
 
-#### unloaded
+#### - `unloaded`
 called when `src` prop was changed and another svg start loading
 
-#### error
+#### - `error`
 called when svg failed to load
 
 ## Comparison
