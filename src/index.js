@@ -26,9 +26,9 @@ const InlineSvgComponent = {
             'svg',
             {
                 on: this.$listeners,
-                attrs: Object.assign(this.initialAttrs, filterAttrs(this.$attrs)),
+                attrs: Object.assign(this.svgAttrs, filterAttrs(this.$attrs)),
                 domProps: {
-                    innerHTML: this.initialContent,
+                    innerHTML: this.svgContent,
                 },
             },
         );
@@ -46,8 +46,8 @@ const InlineSvgComponent = {
     data() {
         return {
             isLoaded: false,
-            initialAttrs: {},
-            initialContent: '',
+            svgAttrs: {},
+            svgContent: '',
         };
     },
     watch: {
@@ -81,17 +81,20 @@ const InlineSvgComponent = {
             cache[src]
                 .then((svg) => {
                     // copy attrs
-                    this.initialAttrs = {};
+                    this.svgAttrs = {};
                     const attrs = svg.attributes;
                     for (let i = attrs.length - 1; i >= 0; i--) {
-                        this.initialAttrs[attrs[i].name] = attrs[i].value;
+                        this.svgAttrs[attrs[i].name] = attrs[i].value;
                     }
                     // copy inner html
-                    this.initialContent = svg.innerHTML;
+                    this.svgContent = svg.innerHTML;
                     // render svg element
                     this.isLoaded = true;
-                    // notify
-                    this.$emit('loaded');
+                    // wait to render
+                    this.$nextTick(() => {
+                        // notify
+                        this.$emit('loaded', this.$el);
+                    });
                 })
                 .catch((err) => {
                     // remove cached rejected promise so next image can try load again

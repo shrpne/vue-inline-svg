@@ -1,3 +1,7 @@
+## 1.3.0 - 2020-03-23
+- Fix: `@loaded` event fired to early (it was fired on SVG load, not on component render)
+- Add: pass SVG element as argument to the `@loaded` callback
+
 ## 1.2.0 - 2019-11-26
 - Add: `transformSource` prop [#9](https://github.com/shrpne/vue-inline-svg/pull/9)
 

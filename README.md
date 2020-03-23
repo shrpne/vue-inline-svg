@@ -71,9 +71,9 @@ new Vue({
 <inline-svg 
     src="image.svg" 
     transformSource="transformSvg"
-    @loaded="svgLoaded()"
+    @loaded="svgLoaded($event)"
     @unloaded="svgUnloaded()"
-    @error="svgLoadError()"
+    @error="svgLoadError($event)"
     width="150" 
     height="150"
     fill="black"
@@ -120,18 +120,30 @@ Other attributes will be passed to inlined `<svg>`. Except attributes with `fals
 
 ### events
 #### - `loaded`
-called when <svg> image is loaded and inlined
+Called when SVG image is loaded and inlined.
+Inlined SVG element passed as argument into the listener’s callback function.
+```html
+<inline-svg @loaded="myInlinedSvg = $event"/>
+```
 
 #### - `unloaded`
-called when `src` prop was changed and another svg start loading
+Called when `src` prop was changed and another SVG start loading.
+```html
+<inline-svg @unloaded="handleUnloaded()"/>
+```
 
 #### - `error`
-called when svg failed to load
+Called when SVG failed to load.
+Error object passed as argument into the listener’s callback function.
+```html
+<inline-svg @error="log($event)"/>
+```
 
 ## Comparison
 
 - This module: [![Minified Size](https://img.shields.io/bundlephobia/min/vue-inline-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-inline-svg)
-- [`vue-simple-svg`](https://github.com/seiyable/vue-simple-svg): [![Minified Size](https://img.shields.io/bundlephobia/min/vue-simple-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-simple-svg), does not cache network requests, has wrapper around svg, attrs passed to `<svg>` are limited, converts `<style>` tag into `style=""` attr
+- [vue-simple-svg](https://github.com/seiyable/vue-simple-svg): [![Minified Size](https://img.shields.io/bundlephobia/min/vue-simple-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-simple-svg), does not cache network requests, has wrapper around svg, attrs passed to `<svg>` are limited, converts `<style>` tag into `style=""` attr
+- [svg-loader](https://github.com/visualfanatic/vue-svg-loader) uses different approach, it inlines SVG during compilation. It has pros that SVG is prerendered and no http request needed. But also it has cons that markup size grows, especially if you have same image repeated several times. (Discussed in [#11](https://github.com/shrpne/vue-inline-svg/issues/11))
 
 
 ## License

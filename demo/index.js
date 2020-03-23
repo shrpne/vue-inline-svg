@@ -20,5 +20,10 @@ new Vue({
             console.log('Error loading index.html');
             console.log(e);
         },
+        logLoaded(el, id) {
+            console.log(id)
+            console.log(el)
+            console.log(document.querySelector(`#${id}`));
+        },
     },
 });
