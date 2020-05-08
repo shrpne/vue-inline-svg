@@ -4,6 +4,7 @@
   "description": "Replace SVG images with inline SVG element",
   "main": "dist/vue-inline-svg.js",
   "module": "src/index.js",
+  "browser": "dist/vue-inline-svg.js",
   "unpkg": "dist/vue-inline-svg.min.js",
   "scripts": {
     "build": "rollup -c rollup.conf.js",
