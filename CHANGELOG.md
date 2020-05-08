@@ -1,3 +1,6 @@
+## 1.3.1 - 2020-05-08
+- Add: `browser` field to package.json. No more extra Webpack configuration is needed by default.
+
 ## 1.3.0 - 2020-03-23
 - Fix: `@loaded` event fired to early (it was fired on SVG load, not on component render)
 - Add: pass SVG element as argument to the `@loaded` callback
