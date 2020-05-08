@@ -6,6 +6,10 @@
   "module": "src/index.js",
   "browser": "dist/vue-inline-svg.js",
   "unpkg": "dist/vue-inline-svg.min.js",
+  "files": [
+    "/src/",
+    "/dist/"
+  ],
   "scripts": {
     "build": "rollup -c rollup.conf.js",
     "test": "npm run lint",
