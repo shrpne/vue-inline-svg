@@ -12,6 +12,22 @@ Loaded SVGs are cached so it will not make network request twice.
 [ci]:      https://travis-ci.org/shrpne/vue-inline-svg
 
 
+- [Install](#install)
+  - [NPM](#npm)
+  - [CDN](#cdn)
+- [Usage](#usage)
+  - [props](#props)
+    - [src](#--src)
+    - [transformSource](#--transformsource)
+  - [SVG attributes](#svg-attributes)
+  - [events](#events)
+    - [loaded](#--loaded)
+    - [unloaded](#--unloaded)
+    - [error](#--error)
+- [Comparison](#comparison)
+- [License](#license)
+
+
 ## Install
 
 ### NPM
@@ -115,8 +131,19 @@ const transform = (svg) => {
 // For cleaner syntax you could use https://github.com/svgdotjs/svg.js
 ```
 
-### attributes
-Other attributes will be passed to inlined `<svg>`. Except attributes with `false` or `null` value.
+### SVG attributes
+Other SVG and HTML attributes will be passed to inlined `<svg>`. Except attributes with `false` or `null` value.
+```html
+<!-- input -->
+<inline-svg 
+    fill-opacity="0.25" 
+    :stroke-opacity="myStrokeOpacity"
+    :color="false"        
+></inline-svg>
+
+<!-- output -->
+<svg fill-opacity="0.25" stroke-opacity="0.5"></svg>
+``` 
 
 ### events
 #### - `loaded`
