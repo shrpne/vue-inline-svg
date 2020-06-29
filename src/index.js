@@ -38,6 +38,9 @@ const InlineSvgComponent = {
             type: String,
             required: true,
         },
+        title: {
+            type: String,
+        },
         transformSource: {
             type: Function,
             default: (svg) => svg,
@@ -122,6 +125,9 @@ const InlineSvgComponent = {
                             let svgEl = result.getElementsByTagName('svg')[0];
                             if (svgEl) {
                                 svgEl = this.transformSource(svgEl);
+                                if (this.title) {
+                                    this.setTitle(svgEl);
+                                }
                                 resolve(svgEl);
                             } else {
                                 reject(new Error('Loaded file is not valid SVG"'));
@@ -137,6 +143,21 @@ const InlineSvgComponent = {
                 request.onerror = reject;
                 request.send();
             });
+        },
+
+        /**
+         * Create or edit the <title> element of a SVG
+         * @param {Object} svg
+         */
+        setTitle(svg) {
+            const titleTags = svg.getElementsByTagName('title');
+            if (titleTags.length) { // overwrite existing title
+                titleTags[0].innerHTML = this.title;
+            } else { // create a title element if one doesn't already exist
+                const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                titleEl.innerHTML = this.title;
+                svg.appendChild(titleEl);
+            }
         },
     },
 };
