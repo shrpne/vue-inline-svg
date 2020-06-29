@@ -18,6 +18,7 @@ Loaded SVGs are cached so it will not make network request twice.
 - [Usage](#usage)
   - [props](#props)
     - [src](#--src)
+    - [title](#--title)
     - [transformSource](#--transformsource)
   - [SVG attributes](#svg-attributes)
   - [events](#events)
@@ -109,6 +110,13 @@ Note: if you use vue-loader assets or vue-cli, then paths like '../assets/my.svg
 Learn more:
 - https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
 - https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
+
+#### - `title`
+Sets/overwrites the title of the SVG
+
+```
+<inline-svg :src="image.svg" :title="My Image"/>
+```
 
 #### - `transformSource`
 Function to transform SVG source
