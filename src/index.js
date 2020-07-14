@@ -89,6 +89,9 @@ const InlineSvgComponent = {
                     for (let i = attrs.length - 1; i >= 0; i--) {
                         this.svgAttrs[attrs[i].name] = attrs[i].value;
                     }
+                    if (this.title) {
+                        this.setTitle(svg);
+                    }
                     // copy inner html
                     this.svgContent = svg.innerHTML;
                     // render svg element
@@ -125,9 +128,6 @@ const InlineSvgComponent = {
                             let svgEl = result.getElementsByTagName('svg')[0];
                             if (svgEl) {
                                 svgEl = this.transformSource(svgEl);
-                                if (this.title) {
-                                    this.setTitle(svgEl);
-                                }
                                 resolve(svgEl);
                             } else {
                                 reject(new Error('Loaded file is not valid SVG"'));
