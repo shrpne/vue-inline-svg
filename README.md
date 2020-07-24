@@ -112,7 +112,7 @@ Learn more:
 - https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
 
 #### - `title`
-Sets/overwrites the title of the SVG
+Sets/overwrites the `<title>` of the SVG
 
 ```
 <inline-svg :src="image.svg" :title="My Image"/>

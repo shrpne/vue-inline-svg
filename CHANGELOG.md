@@ -1,3 +1,8 @@
+## 2.0.0 - 2020-07-25
+- Add: `title` prop
+- Fix: `transform-source` to react on property change and not to only transform on initial load 
+- **BREAKING**: `transform-source` now doesn't affect resulting SVG's attributes, use attrs on the component instead 
+
 ## 1.3.1 - 2020-05-08
 - Add: `browser` field to package.json. No more extra Webpack configuration is needed by default.
 

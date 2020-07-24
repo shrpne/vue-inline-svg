@@ -14,7 +14,6 @@ function filterAttrs(attrs) {
     }, {});
 }
 
-
 const InlineSvgComponent = {
     // name: 'inline-svg',
     inheritAttrs: false,
@@ -26,9 +25,9 @@ const InlineSvgComponent = {
             'svg',
             {
                 on: this.$listeners,
-                attrs: Object.assign(this.svgAttrs, filterAttrs(this.$attrs)),
+                attrs: Object.assign(this.getSvgAttrs(this.svgElSource), filterAttrs(this.$attrs)),
                 domProps: {
-                    innerHTML: this.svgContent,
+                    innerHTML: this.getSvgContent(this.svgElSource),
                 },
             },
         );
@@ -49,26 +48,51 @@ const InlineSvgComponent = {
     data() {
         return {
             isLoaded: false,
-            svgAttrs: {},
-            svgContent: '',
+            /** @type SVGElement */
+            svgElSource: null,
         };
     },
     watch: {
         src(newValue) {
-            // re-generate inline svg
-            this.inline(newValue);
+            // re-generate cached svg (`svgElSource`)
+            this.cacheSource(newValue);
         },
     },
     mounted() {
         // generate inline svg
-        this.inline(this.src);
+        this.cacheSource(this.src);
     },
     methods: {
+        getSvgAttrs(svgEl) {
+            // copy attrs
+            let svgAttrs = {};
+            const attrs = svgEl?.attributes;
+            if (!attrs) {
+                return svgAttrs;
+            }
+            for (let i = attrs.length - 1; i >= 0; i--) {
+                svgAttrs[attrs[i].name] = attrs[i].value;
+            }
+            return svgAttrs;
+        },
+        getSvgContent(svgEl) {
+            if (!svgEl) {
+                return '';
+            }
+            svgEl = svgEl.cloneNode(true);
+            svgEl = this.transformSource(svgEl);
+            if (this.title) {
+                setTitle(svgEl, this.title);
+            }
+
+            // copy inner html
+            return svgEl.innerHTML;
+        },
         /**
-         * Replace image with loaded svg
+         * Get svgElSource
          * @param {string} src
          */
-        inline(src) {
+        cacheSource(src) {
             // fill cache by src with promise
             if (!cache[src]) {
                 // notify svg is unloaded
@@ -83,18 +107,7 @@ const InlineSvgComponent = {
             // inline svg when cached promise resolves
             cache[src]
                 .then((svg) => {
-                    // copy attrs
-                    this.svgAttrs = {};
-                    const attrs = svg.attributes;
-                    for (let i = attrs.length - 1; i >= 0; i--) {
-                        this.svgAttrs[attrs[i].name] = attrs[i].value;
-                    }
-                    if (this.title) {
-                        this.setTitle(svg);
-                    }
-                    // copy inner html
-                    this.svgContent = svg.innerHTML;
-                    // render svg element
+                    this.svgElSource = svg;
                     this.isLoaded = true;
                     // wait to render
                     this.$nextTick(() => {
@@ -127,7 +140,7 @@ const InlineSvgComponent = {
                             const result = parser.parseFromString(request.responseText, 'text/xml');
                             let svgEl = result.getElementsByTagName('svg')[0];
                             if (svgEl) {
-                                svgEl = this.transformSource(svgEl);
+                                // svgEl = this.transformSource(svgEl);
                                 resolve(svgEl);
                             } else {
                                 reject(new Error('Loaded file is not valid SVG"'));
@@ -144,23 +157,24 @@ const InlineSvgComponent = {
                 request.send();
             });
         },
-
-        /**
-         * Create or edit the <title> element of a SVG
-         * @param {Object} svg
-         */
-        setTitle(svg) {
-            const titleTags = svg.getElementsByTagName('title');
-            if (titleTags.length) { // overwrite existing title
-                titleTags[0].innerHTML = this.title;
-            } else { // create a title element if one doesn't already exist
-                const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-                titleEl.innerHTML = this.title;
-                svg.appendChild(titleEl);
-            }
-        },
     },
 };
+
+/**
+ * Create or edit the <title> element of a SVG
+ * @param {SVGElement} svg
+ * @param {string} title
+ */
+function setTitle(svg, title) {
+    const titleTags = svg.getElementsByTagName('title');
+    if (titleTags.length) { // overwrite existing title
+        titleTags[0].textContent = title;
+    } else { // create a title element if one doesn't already exist
+        const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        titleEl.textContent = title;
+        svg.appendChild(titleEl);
+    }
+}
 
 const InlineSvgPlugin = {
     install(Vue) {

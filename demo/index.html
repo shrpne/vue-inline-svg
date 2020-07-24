@@ -12,11 +12,28 @@
 <div id="app">
     <div>
         <div>
-            <inline-svg id="svg1" v-bind:src="`./img/${currentIcon}.svg`" width="150" height="150" :fill="false" @click="logClick" @loaded="logLoaded($event, 'svg1')"></inline-svg>
-            <inline-svg id="svg2" v-bind:src="`./img/${currentIcon}.svg`" v-bind:width="currentSize" v-bind:height="currentSize" :fill="''" @loaded="logLoaded($event, 'svg2')"></inline-svg>
+            <inline-svg
+                    id="svg1" width="150" height="150"
+                    :src="`./img/${currentIcon}.svg`"
+                    :fill="false"
+                    :title="currentTitle"
+                    @click="logClick"
+                    @loaded="logLoaded($event, 'svg1')"
+            ></inline-svg>
+            <inline-svg
+                    id="svg2"
+                    :src="`./img/${currentIcon}.svg`"
+                    :width="currentSize"
+                    :height="currentSize"
+                    :transform-source="transform"
+                    :fill="''"
+                    :title="currentTitle"
+                    @loaded="logLoaded($event, 'svg2')"
+            ></inline-svg>
             <inline-svg src="./index.html" v-on:error="logError"></inline-svg>
         </div>
         <div>
+            src:
             <label>
                 <input type="radio" name="icon" value="firefox" v-model="currentIcon">
                 Firefox
@@ -27,6 +44,7 @@
             </label>
         </div>
         <div>
+            attributes:
             <label>
                 <input type="radio" name="size" value="150" v-model="currentSize">
                 150
@@ -34,6 +52,21 @@
             <label>
                 <input type="radio" name="size" value="100" v-model="currentSize">
                 100
+            </label>
+        </div>
+        <div>
+            transform-source:
+            <label>
+                <input type="radio" name="transform" value="none" v-model="currentTransform">
+                none
+            </label>
+            <label>
+                <input type="radio" name="transform" value="black" v-model="currentTransform">
+                black
+            </label>
+            <label>
+                <input type="radio" name="transform" value="green" v-model="currentTransform">
+                green
             </label>
         </div>
     </div>
