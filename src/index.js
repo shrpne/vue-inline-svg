@@ -38,6 +38,9 @@ const InlineSvgComponent = {
             type: String,
             required: true,
         },
+        title: {
+            type: String,
+        },
         transformSource: {
             type: Function,
             default: (svg) => svg,
@@ -85,6 +88,9 @@ const InlineSvgComponent = {
                     const attrs = svg.attributes;
                     for (let i = attrs.length - 1; i >= 0; i--) {
                         this.svgAttrs[attrs[i].name] = attrs[i].value;
+                    }
+                    if (this.title) {
+                        this.setTitle(svg);
                     }
                     // copy inner html
                     this.svgContent = svg.innerHTML;
@@ -137,6 +143,21 @@ const InlineSvgComponent = {
                 request.onerror = reject;
                 request.send();
             });
+        },
+
+        /**
+         * Create or edit the <title> element of a SVG
+         * @param {Object} svg
+         */
+        setTitle(svg) {
+            const titleTags = svg.getElementsByTagName('title');
+            if (titleTags.length) { // overwrite existing title
+                titleTags[0].innerHTML = this.title;
+            } else { // create a title element if one doesn't already exist
+                const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+                titleEl.innerHTML = this.title;
+                svg.appendChild(titleEl);
+            }
         },
     },
 };
