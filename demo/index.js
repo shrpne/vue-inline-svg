@@ -22,13 +22,14 @@ new Vue({
         logClick() {
             console.log('click');
         },
-        logError(e) {
-            console.log('Error loading index.html');
-            console.log(e);
+        logError(e, id) {
+            console.log(id, 'Error loading index.html', e);
         },
         logLoaded(el, id) {
             console.log('loaded', {id, el});
-            console.log(document.querySelector(`#${id}`));
+        },
+        logUnloaded(id) {
+            console.log('unloaded', id);
         },
         transform(el) {
             if (this.currentTransform === 'none') {

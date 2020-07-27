@@ -19,6 +19,7 @@
                     :title="currentTitle"
                     @click="logClick"
                     @loaded="logLoaded($event, 'svg1')"
+                    @unloaded="logUnloaded('svg1')"
             ></inline-svg>
             <inline-svg
                     id="svg2"
@@ -28,9 +29,11 @@
                     :transform-source="transform"
                     :fill="''"
                     :title="currentTitle"
+                    :keep-during-loading="false"
                     @loaded="logLoaded($event, 'svg2')"
+                    @unloaded="logUnloaded('svg2')"
             ></inline-svg>
-            <inline-svg src="./index.html" v-on:error="logError"></inline-svg>
+            <inline-svg id="svg3" src="./index.html" v-on:error="logError($event, 'svg3')"></inline-svg>
         </div>
         <div>
             src:

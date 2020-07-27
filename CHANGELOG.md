@@ -1,7 +1,8 @@
 ## 2.0.0 - 2020-07-25
 - Add: `title` prop
-- Fix: `transform-source` to react on property change and not to only transform on initial load 
-- **BREAKING**: `transform-source` now doesn't affect resulting SVG's attributes, use attrs on the component instead 
+- Fix: `transform-source` to react on property change and not to only transform on initial load
+- **BREAKING**: `transform-source` now doesn't affect resulting SVG's attributes, use attrs on the component instead
+- **BREAKING** Add: `keep-during-loading` prop, `true` by default. It makes vue-inline-svg to preserve old image visible, when new image is being loaded. Pass `false` to disable it and switch to old behaviour.
 
 ## 1.3.1 - 2020-05-08
 - Add: `browser` field to package.json. No more extra Webpack configuration is needed by default.

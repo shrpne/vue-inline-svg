@@ -18,7 +18,7 @@ const InlineSvgComponent = {
     // name: 'inline-svg',
     inheritAttrs: false,
     render(createElement) {
-        if (!this.isLoaded) {
+        if (!this.svgElSource) {
             return null;
         }
         return createElement(
@@ -44,10 +44,13 @@ const InlineSvgComponent = {
             type: Function,
             default: (svg) => svg,
         },
+        keepDuringLoading: {
+            type: Boolean,
+            default: true,
+        },
     },
     data() {
         return {
-            isLoaded: false,
             /** @type SVGElement */
             svgElSource: null,
         };
@@ -55,18 +58,18 @@ const InlineSvgComponent = {
     watch: {
         src(newValue) {
             // re-generate cached svg (`svgElSource`)
-            this.cacheSource(newValue);
+            this.getSource(newValue);
         },
     },
     mounted() {
-        // generate inline svg
-        this.cacheSource(this.src);
+        // generate `svgElSource`
+        this.getSource(this.src);
     },
     methods: {
         getSvgAttrs(svgEl) {
             // copy attrs
             let svgAttrs = {};
-            const attrs = svgEl?.attributes;
+            const attrs = svgEl.attributes;
             if (!attrs) {
                 return svgAttrs;
             }
@@ -76,9 +79,6 @@ const InlineSvgComponent = {
             return svgAttrs;
         },
         getSvgContent(svgEl) {
-            if (!svgEl) {
-                return '';
-            }
             svgEl = svgEl.cloneNode(true);
             svgEl = this.transformSource(svgEl);
             if (this.title) {
@@ -92,23 +92,22 @@ const InlineSvgComponent = {
          * Get svgElSource
          * @param {string} src
          */
-        cacheSource(src) {
+        getSource(src) {
             // fill cache by src with promise
             if (!cache[src]) {
-                // notify svg is unloaded
-                if (this.isLoaded) {
-                    this.isLoaded = false;
-                    this.$emit('unloaded');
-                }
                 // download
                 cache[src] = this.download(src);
+            }
+            // notify svg is unloaded
+            if (this.svgElSource && cache[src].isPending() && !this.keepDuringLoading) {
+                this.svgElSource = null;
+                this.$emit('unloaded');
             }
 
             // inline svg when cached promise resolves
             cache[src]
                 .then((svg) => {
                     this.svgElSource = svg;
-                    this.isLoaded = true;
                     // wait to render
                     this.$nextTick(() => {
                         // notify
@@ -116,6 +115,11 @@ const InlineSvgComponent = {
                     });
                 })
                 .catch((err) => {
+                    // notify svg is unloaded
+                    if (this.svgElSource) {
+                        this.svgElSource = null;
+                        this.$emit('unloaded');
+                    }
                     // remove cached rejected promise so next image can try load again
                     delete cache[src];
                     this.$emit('error', err);
@@ -128,7 +132,7 @@ const InlineSvgComponent = {
          * @returns {Promise<Element>}
          */
         download(url) {
-            return new Promise((resolve, reject) => {
+            return makePromiseState(new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('GET', url, true);
 
@@ -155,7 +159,7 @@ const InlineSvgComponent = {
 
                 request.onerror = reject;
                 request.send();
-            });
+            }));
         },
     },
 };
@@ -174,6 +178,39 @@ function setTitle(svg, title) {
         titleEl.textContent = title;
         svg.appendChild(titleEl);
     }
+}
+
+/**
+ * @typedef {Promise} PromiseWithState
+ * @property {Function<boolean>} isPending
+ */
+
+/**
+ * This function allow you to modify a JS Promise by adding some status properties.
+ * @param {Promise|PromiseWithState} promise
+ * @return {PromiseWithState}
+ */
+function makePromiseState(promise) {
+    // Don't modify any promise that has been already modified.
+    if (promise.isPending) return promise;
+
+    // Set initial state
+    let isPending = true;
+
+    // Observe the promise, saving the fulfillment in a closure scope.
+    let result = promise.then(
+        (v) => {
+            isPending = false;
+            return v;
+        },
+        (e) => {
+            isPending = false;
+            throw e;
+        },
+    );
+
+    result.isPending = function getIsPending() { return isPending; };
+    return result;
 }
 
 const InlineSvgPlugin = {

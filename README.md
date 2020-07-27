@@ -19,6 +19,7 @@ Loaded SVGs are cached so it will not make network request twice.
   - [props](#props)
     - [src](#--src)
     - [title](#--title)
+    - [keepDuringLoading](#--keepduringloading)
     - [transformSource](#--transformsource)
   - [SVG attributes](#svg-attributes)
   - [events](#events)
@@ -62,6 +63,7 @@ import InlineSvg from 'vue-inline-svg';
 Vue.component('inline-svg', InlineSvg);
 ```
 
+
 ### CDN
 
 ```html
@@ -82,6 +84,7 @@ new Vue({
 </script>
 ```
 
+
 ## Usage
 
 ```html
@@ -99,34 +102,47 @@ new Vue({
 ``` 
 [Example](https://github.com/shrpne/vue-inline-svg/blob/master/demo/index.html)
 
+
 ### props
 #### - `src`
 Path to SVG file
 
-Note: if you use vue-loader assets or vue-cli, then paths like '../assets/my.svg' will not be handled by file-loader automatically like vue-cli do for `<img>` tag, so you will need to use it with `require`:
+```html
+<inline-svg src="/my.svg"/>
 ```
+
+Note: if you use vue-loader assets or vue-cli, then paths like '../assets/my.svg' will not be handled by file-loader automatically like vue-cli do for `<img>` tag, so you will need to use it with `require`:
+```html
 <inline-svg :src="require('../assets/my.svg')"/>
 ```
 Learn more:
 - https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
 - https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
 
+
 #### - `title`
 Sets/overwrites the `<title>` of the SVG
 
+```html
+<inline-svg :src="image.svg" title="My Image"/>
 ```
-<inline-svg :src="image.svg" :title="My Image"/>
+
+
+#### - `keepDuringLoading`
+`true` by default. It makes vue-inline-svg to preserve old image visible, when new image is being loaded. Pass `false` to disable it and show nothing during loading.
+
+```html
+<inline-svg :src="image.svg" :keepDuringLoading="false"/>
 ```
 
 #### - `transformSource`
 Function to transform SVG source
  
 This example create circle in svg:
-```
+```html
 <inline-svg :src="image.svg" :transformSource="transform"/>
 
-....
-
+<script>
 const transform = (svg) => {
     let point = document.createElementNS("http://www.w3.org/2000/svg", 'circle');
         point.setAttributeNS(null, 'cx', '20');
@@ -137,7 +153,9 @@ const transform = (svg) => {
     return svg;
 }
 // For cleaner syntax you could use https://github.com/svgdotjs/svg.js
+</script>
 ```
+
 
 ### SVG attributes
 Other SVG and HTML attributes will be passed to inlined `<svg>`. Except attributes with `false` or `null` value.
@@ -152,6 +170,7 @@ Other SVG and HTML attributes will be passed to inlined `<svg>`. Except attribut
 <!-- output -->
 <svg fill-opacity="0.25" stroke-opacity="0.5"></svg>
 ``` 
+
 
 ### events
 #### - `loaded`
