@@ -15,6 +15,7 @@ Loaded SVGs are cached so it will not make network request twice.
 - [Install](#install)
   - [NPM](#npm)
   - [CDN](#cdn)
+  - [Vue v3](#vue-v3)
 - [Usage](#usage)
   - [props](#props)
     - [src](#--src)
@@ -82,6 +83,17 @@ new Vue({
 // ...
 });
 </script>
+```
+
+### Vue v3
+
+Version of `vue-inline-svg` with support of Vue v3 is available under `next` tag
+```bash
+npm install vue-inline-svg@next
+```
+
+```html
+<script src="https://unpkg.com/vue-inline-svg@next"></script>
 ```
 
 
