@@ -4,6 +4,8 @@ module.exports = {
     },
     ignorePatterns: [
         ".eslintrc.js",
+        "babel.config.js",
+        "rollup.conf.js",
         "demo/**",
         "dist/**",
     ],
@@ -19,6 +21,7 @@ module.exports = {
         "prefer-destructuring": ["error", {"object": true, "array": false}],
         // allow extension in imports
         "import/extensions": "off",
+        "prefer-object-spread": "off",
     },
     "env": {
         "browser": true

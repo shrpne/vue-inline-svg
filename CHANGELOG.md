@@ -1,3 +1,7 @@
+## 3.0.0 - 2020-07-28
+- Add: Vue v3 support
+- **BREAKING**: remove named exports. Only default export of the component is remained. UMD build now expose `VueInlineSvg` variable representing component.
+
 ## 2.0.0 - 2020-07-25
 - Add: `title` prop
 - Fix: `transform-source` to react on property change and not to only transform on initial load

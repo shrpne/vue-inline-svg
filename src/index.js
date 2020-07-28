@@ -1,3 +1,7 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+// import { h as createElement } from '../node_modules/vue/dist/vue.esm-browser.js';
+import { h as createElement } from 'vue';
+
 /** @type Object{string: Promise<Element>} */
 const cache = {};
 
@@ -14,22 +18,24 @@ function filterAttrs(attrs) {
     }, {});
 }
 
-const InlineSvgComponent = {
+const InlineSvg = {
     // name: 'inline-svg',
     inheritAttrs: false,
-    render(createElement) {
+    render() {
         if (!this.svgElSource) {
             return null;
         }
         return createElement(
             'svg',
-            {
-                on: this.$listeners,
-                attrs: Object.assign(this.getSvgAttrs(this.svgElSource), filterAttrs(this.$attrs)),
-                domProps: {
-                    innerHTML: this.getSvgContent(this.svgElSource),
-                },
-            },
+            Object.assign(
+                {},
+                // source attrs
+                this.getSvgAttrs(this.svgElSource),
+                // component attrs and listeners
+                filterAttrs(this.$attrs),
+                // content
+                { innerHTML: this.getSvgContent(this.svgElSource) },
+            ),
         );
     },
     props: {
@@ -213,10 +219,4 @@ function makePromiseState(promise) {
     return result;
 }
 
-const InlineSvgPlugin = {
-    install(Vue) {
-        Vue.component('inline-svg', InlineSvgComponent);
-    },
-};
-
-export { InlineSvgComponent as default, InlineSvgComponent, InlineSvgPlugin };
+export default InlineSvg;

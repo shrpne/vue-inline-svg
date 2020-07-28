@@ -5,6 +5,7 @@ import {terser} from 'rollup-plugin-terser';
 export default [
     {
         input: 'src/index.js',
+        external: ['vue'],
         plugins: [
             babel(),
         ],
@@ -13,6 +14,7 @@ export default [
                 format: 'umd',
                 file: 'dist/vue-inline-svg.js',
                 name: 'VueInlineSvg',
+                globals: {vue: 'Vue'},
             },
             // {
             //     format: 'es',
@@ -22,6 +24,7 @@ export default [
     },
     {
         input: 'src/index.js',
+        external: ['vue'],
         plugins: [
             babel(),
             terser(),
@@ -31,6 +34,7 @@ export default [
                 format: 'umd',
                 file: 'dist/vue-inline-svg.min.js',
                 name: 'VueInlineSvg',
+                globals: {vue: 'Vue'},
             }
         ]
     }

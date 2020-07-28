@@ -1,10 +1,7 @@
-import InlineSvg from '../src/index.js';
+const createElement = window.Vue.h;
+const InlineSvg = window.VueInlineSvg;
 
-new Vue({
-    el: '#app',
-    components: {
-        InlineSvg,
-    },
+const App = {
     data() {
         return {
             currentIcon: 'firefox',
@@ -16,26 +13,20 @@ new Vue({
             console.log('click');
         },
     },
-    render(createElement) {
+    render() {
         let self = this;
         return createElement('div', [
             createElement('div', [
                 createElement(InlineSvg, {
-                    attrs: {
-                        src: `./img/${self.currentIcon}.svg`,
-                        width: 150,
-                        height: 150,
-                    },
-                    on: {
-                        click: this.logClick,
-                    },
+                    src: `./img/${self.currentIcon}.svg`,
+                    width: 150,
+                    height: 150,
+                    onClick: this.logClick,
                 }),
                 createElement(InlineSvg, {
-                    attrs: {
-                        src: `./img/${self.currentIcon}.svg`,
-                        width: self.currentSize,
-                        height: self.currentSize,
-                    },
+                    src: `./img/${self.currentIcon}.svg`,
+                    width: self.currentSize,
+                    height: self.currentSize,
                 }),
             ]),
             createElement('div', [
@@ -57,19 +48,17 @@ new Vue({
         function makeRadio(name, value, dataName) {
             return createElement('label', [
                 createElement('input', {
-                    attrs: {
-                        type: 'radio',
-                        name,
-                        value,
-                    },
-                    on: {
-                        input: (event) => {
-                            self[dataName] = event.target.value;
-                        },
+                    type: 'radio',
+                    name,
+                    value,
+                    onInput: (event) => {
+                        self[dataName] = event.target.value;
                     },
                 }),
                 value.toString(),
             ]);
         }
     },
-});
+};
+
+window.Vue.createApp(App).mount('#app');

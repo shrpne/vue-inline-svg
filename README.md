@@ -50,37 +50,26 @@ export default {
 }
 ```
 
-Or register globally in the root Vue instance
+Or register globally in the Vue app
 ```js
-import Vue from 'vue';
-
-// as a plugin
-import {InlineSvgPlugin} from 'vue-inline-svg';
-Vue.use(InlineSvgPlugin);
-
-// or as a component
+import { createApp } from 'vue'
 import InlineSvg from 'vue-inline-svg';
-Vue.component('inline-svg', InlineSvg);
+
+const app = createApp({/*...*/});
+app.component('inline-svg', InlineSvg);
 ```
 
 
 ### CDN
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://unpkg.com/vue"></script>
 <!-- Include the `vue-inline-svg` script on your page after Vue script -->
 <script src="https://unpkg.com/vue-inline-svg"></script>
 
 <script>
-// Register as a plugin
-Vue.use(VueInlineSvg.InlineSvgPlugin);
-
-// or as a component
-Vue.component('inline-svg', VueInlineSvg.InlineSvgComponent);
-
-new Vue({
-// ...
-});
+const app = Vue.createApp({/*...*/});
+app.component('inline-svg', VueInlineSvg);
 </script>
 ```
 

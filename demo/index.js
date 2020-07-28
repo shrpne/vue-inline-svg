@@ -1,10 +1,6 @@
-// eslint-disable-next-line import/extensions
-import InlineSvg from '../src/index.js';
-
-new Vue({
-    el: '#app',
+const App = {
     components: {
-        InlineSvg,
+        InlineSvg: window.VueInlineSvg,
     },
     data() {
         return {
@@ -19,8 +15,8 @@ new Vue({
         },
     },
     methods: {
-        logClick() {
-            console.log('click');
+        logClick(e) {
+            console.log('click', e.currentTarget);
         },
         logError(e, id) {
             console.log(id, 'Error loading index.html', e);
@@ -57,4 +53,6 @@ new Vue({
             return el;
         },
     },
-});
+};
+
+window.Vue.createApp(App).mount('#app');
