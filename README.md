@@ -28,6 +28,8 @@ Loaded SVGs are cached so it will not make network request twice.
     - [unloaded](#--unloaded)
     - [error](#--error)
 - [Comparison](#comparison)
+- [Changelog](#changelog)
+- [Contributing](#contributing)
 - [License](#license)
 
 
@@ -210,6 +212,14 @@ Error object passed as argument into the listener’s callback function.
 - This module: [![Minified Size](https://img.shields.io/bundlephobia/min/vue-inline-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-inline-svg)
 - [vue-simple-svg](https://github.com/seiyable/vue-simple-svg): [![Minified Size](https://img.shields.io/bundlephobia/min/vue-simple-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-simple-svg), does not cache network requests, has wrapper around svg, attrs passed to `<svg>` are limited, converts `<style>` tag into `style=""` attr
 - [svg-loader](https://github.com/visualfanatic/vue-svg-loader) uses different approach, it inlines SVG during compilation. It has pros that SVG is prerendered and no http request needed. But also it has cons that markup size grows, especially if you have same image repeated several times. (Discussed in [#11](https://github.com/shrpne/vue-inline-svg/issues/11))
+
+
+## Changelog
+[CHANGELOG.md](https://github.com/shrpne/vue-inline-svg/blob/master/CHANGELOG.md)
+
+
+## Contributing
+[CONTRIBUTING.md](https://github.com/shrpne/vue-inline-svg/blob/master/CONTRIBUTING.md)
 
 
 ## License
