@@ -55,6 +55,7 @@ const InlineSvg = {
             default: true,
         },
     },
+    emits: ['loaded', 'unloaded', 'error'],
     data() {
         return {
             /** @type SVGElement */
