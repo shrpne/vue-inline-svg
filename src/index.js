@@ -49,6 +49,7 @@ const InlineSvgComponent = {
             default: true,
         },
     },
+    emits: ['loaded', 'unloaded', 'error'],
     data() {
         return {
             /** @type SVGElement */
