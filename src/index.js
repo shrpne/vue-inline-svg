@@ -53,6 +53,8 @@ const InlineSvgComponent = {
         return {
             /** @type SVGElement */
             svgElSource: null,
+            /** @type Number */
+            status: 0,
         };
     },
     watch: {
@@ -137,6 +139,7 @@ const InlineSvgComponent = {
                 request.open('GET', url, true);
 
                 request.onload = () => {
+                    this.status = request.status;
                     if (request.status >= 200 && request.status < 400) {
                         try {
                             // Setup a parser to convert the response to text/xml in order for it to be manipulated and changed
