@@ -1,6 +1,6 @@
 {
   "name": "vue-inline-svg",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.3",
   "description": "Replace SVG images with inline SVG element",
   "main": "dist/vue-inline-svg.js",
   "module": "src/index.js",
