@@ -15,7 +15,7 @@ function filterAttrs(attrs) {
 }
 
 const InlineSvgComponent = {
-    // name: 'inline-svg',
+    name: 'InlineSvg',
     inheritAttrs: false,
     render(createElement) {
         if (!this.svgElSource) {
