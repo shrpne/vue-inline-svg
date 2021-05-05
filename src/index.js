@@ -1,5 +1,5 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-// import { h as createElement } from '../node_modules/vue/dist/vue.esm-browser.js';
+// peer dep is not installed during test
+// eslint-disable-next-line import/no-unresolved
 import { h as createElement } from 'vue';
 
 /** @type Object{string: Promise<Element>} */
