@@ -6,13 +6,15 @@
   "module": "src/index.js",
   "browser": "dist/vue-inline-svg.js",
   "unpkg": "dist/vue-inline-svg.min.js",
+  "types": "types/index.d.ts",
   "files": [
     "/src/",
+    "/types/",
     "/dist/"
   ],
   "scripts": {
     "build": "rollup -c rollup.conf.js",
-    "test": "npm run lint",
+    "test": "npm run lint && check-dts test/*.ts",
     "lint": "eslint src/*.js",
     "lint:fix": "eslint src/*.js --fix",
     "prepublishOnly": "npm run test && npm run build",
@@ -41,6 +43,7 @@
     "@babel/core": "^7.14.0",
     "@babel/preset-env": "^7.14.0",
     "@rollup/plugin-babel": "^5.3.0",
+    "check-dts": "^0.5.6",
     "eslint": "^7.25.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1",
