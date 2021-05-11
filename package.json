@@ -14,7 +14,7 @@
   ],
   "scripts": {
     "build": "rollup -c rollup.conf.js",
-    "test": "npm run lint && npm i vue@2 --no-save && check-dts test/*.ts",
+    "test": "npm run lint && npx npm-install-peers && check-dts test/*.ts",
     "lint": "eslint src/*.js",
     "lint:fix": "eslint src/*.js --fix",
     "prepublishOnly": "npm run test && npm run build",

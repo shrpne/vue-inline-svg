@@ -1,6 +1,5 @@
-import Vue from 'vue';
+import {createApp} from 'vue';
 
 // or as a component
 import InlineSvg from '../';
-// import InlineSvg = require('../')
-Vue.component('inline-svg', InlineSvg);
+createApp({}).component('inline-svg', InlineSvg);
