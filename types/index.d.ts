@@ -1,3 +1,9 @@
+/*
+Based on:
+https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/chenfengyuan__vue-qrcode/index.d.ts
+https://github.com/DefinitelyTyped/DefinitelyTyped/blob/aa5c66c087896ff55568b76ae49f77321ba0123a/types/vue-datetime/index.d.ts
+*/
+
 import { VueConstructor } from 'vue';
 
 interface InlineSvgProps {
@@ -12,5 +18,5 @@ interface InlineSvgConstructor extends VueConstructor {
     props: InlineSvgProps;
 }
 
-export const InlineSvg: InlineSvgConstructor;
-export default InlineSvg;
+declare const InlineSvg: InlineSvgConstructor;
+export = InlineSvg;
