@@ -1,3 +1,6 @@
+## 2.1.0 - 2021-10-04
+- Add .d.ts types
+
 ## 2.0.0 - 2020-07-25
 - Add: `title` prop
 - Fix: `transform-source` to react on property change and not to only transform on initial load
