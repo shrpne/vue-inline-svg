@@ -5,7 +5,7 @@ https://github.com/DefinitelyTyped/DefinitelyTyped/blob/aa5c66c087896ff55568b76a
 */
 
 
-import { VueConstructor } from 'vue';
+import { VueConstructor, PluginFunction } from 'vue';
 
 interface InlineSvgProps {
     src: string;
@@ -14,9 +14,16 @@ interface InlineSvgProps {
     keepDuringLoading: boolean;
 }
 
+interface InlineSvgPlugin {
+    install: PluginFunction<never>
+}
+
+export declare const InlineSvgPlugin: InlineSvgPlugin;
+
 interface InlineSvgConstructor extends VueConstructor {
     props: InlineSvgProps;
 }
 
-declare const InlineSvg: InlineSvgConstructor;
-export = InlineSvg;
+export declare const InlineSvgComponent: InlineSvgConstructor;
+
+export default InlineSvgComponent;
