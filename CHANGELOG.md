@@ -5,6 +5,10 @@
 - Add: Vue v3 support
 - **BREAKING**: remove named exports. Only default export of the component is remained. UMD build now expose `VueInlineSvg` variable representing component.
 
+
+## 2.1.1 - 2022-10-18
+- Fix .d.ts. types to support named exports
+
 ## 2.1.0 - 2021-10-04
 - Add .d.ts types
 
