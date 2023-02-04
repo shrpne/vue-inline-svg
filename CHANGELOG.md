@@ -1,3 +1,7 @@
+## 3.1.1 - 2023-02-04
+- Fix <title> position: prepend instead of append (#48)
+- Fix `transformSource` .d.ts types (in #50)
+
 ## 3.1.0 - 2021-10-04
 - Add .d.ts types
 
