@@ -220,4 +220,6 @@ const InlineSvgPlugin = {
     },
 };
 
+// @TODO https://github.com/airbnb/javascript/pull/2721 need to be fixed
+// eslint-disable-next-line no-restricted-exports
 export { InlineSvgComponent as default, InlineSvgComponent, InlineSvgPlugin };

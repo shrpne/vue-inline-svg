@@ -9,9 +9,9 @@ import { VueConstructor, PluginFunction } from 'vue';
 
 interface InlineSvgProps {
     src: string;
-    title: string;
-    transformSource: (svg: SVGElement) => SVGElement;
-    keepDuringLoading: boolean;
+    title?: string;
+    transformSource?: (svg: SVGElement) => SVGElement;
+    keepDuringLoading?: boolean;
 }
 
 interface InlineSvgPlugin {
