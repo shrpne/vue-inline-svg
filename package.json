@@ -2,6 +2,7 @@
   "name": "vue-inline-svg",
   "version": "3.1.0",
   "description": "Replace SVG images with inline SVG element",
+  "type": "module",
   "main": "dist/vue-inline-svg.js",
   "module": "src/index.js",
   "browser": "dist/vue-inline-svg.js",
@@ -14,7 +15,9 @@
   ],
   "scripts": {
     "build": "rollup -c rollup.conf.js",
-    "test": "npm run lint && npx npm-install-peers && check-dts test/*.ts",
+    "test": "npm run lint && npm run test:ts",
+    "test:ts": "tsc -p .",
+    "test:dts": "npx npm-install-peers && check-dts test/*.ts",
     "lint": "eslint src/*.js",
     "lint:fix": "eslint src/*.js --fix",
     "prepublishOnly": "npm run test && npm run build",
@@ -43,15 +46,16 @@
     "vue": "^3"
   },
   "devDependencies": {
-    "@babel/core": "^7.19.3",
-    "@babel/preset-env": "^7.19.4",
-    "@rollup/plugin-babel": "^5.3.1",
-    "check-dts": "^0.5.6",
-    "eslint": "^7.32.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-plugin-import": "^2.26.0",
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "@rollup/plugin-babel": "^6.0.3",
+    "@rollup/plugin-terser": "^0.4.0",
+    "check-dts": "^0.6.7",
+    "eslint": "^8.33.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.27.5",
     "pre-commit": "^1.2.2",
-    "rollup": "^2.79.1",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup": "^3.13.0",
+    "typescript": "^4.9.5"
   }
 }

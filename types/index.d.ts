@@ -9,7 +9,7 @@ import { DefineComponent, ComponentOptionsMixin, VNodeProps, AllowedComponentPro
 interface InlineSvg {
     src: string;
     title?: string;
-    transformSource?: (svg: string) => string;
+    transformSource?: (svg: SVGElement) => SVGElement;
     keepDuringLoading?: boolean;
 }
 
