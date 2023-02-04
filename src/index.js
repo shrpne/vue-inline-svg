@@ -1,4 +1,4 @@
-/** @type Object{string: Promise<Element>} */
+/** @type Record<string, PromiseWithState<Element>> */
 const cache = {};
 
 /**
@@ -99,7 +99,7 @@ const InlineSvgComponent = {
                 cache[src] = this.download(src);
             }
             // notify svg is unloaded
-            if (this.svgElSource && cache[src].isPending() && !this.keepDuringLoading) {
+            if (this.svgElSource && cache[src].getIsPending() && !this.keepDuringLoading) {
                 this.svgElSource = null;
                 this.$emit('unloaded');
             }
@@ -129,7 +129,7 @@ const InlineSvgComponent = {
         /**
          * Get the contents of the SVG
          * @param {string} url
-         * @returns {Promise<Element>}
+         * @returns {PromiseWithState<Element>}
          */
         download(url) {
             return makePromiseState(new Promise((resolve, reject) => {
@@ -182,18 +182,20 @@ function setTitle(svg, title) {
 }
 
 /**
- * @typedef {Promise} PromiseWithState
- * @property {Function<boolean>} isPending
+ * @typedef {Promise & object} PromiseWithState
+ * @property {function: boolean} getIsPending
+ * @template T
  */
 
 /**
  * This function allow you to modify a JS Promise by adding some status properties.
- * @param {Promise|PromiseWithState} promise
- * @return {PromiseWithState}
+ * @template {any} T
+ * @param {Promise<T>|PromiseWithState<T>} promise
+ * @return {PromiseWithState<T>}
  */
 function makePromiseState(promise) {
     // Don't modify any promise that has been already modified.
-    if (promise.isPending) return promise;
+    if (promise.getIsPending) return promise;
 
     // Set initial state
     let isPending = true;
@@ -210,7 +212,7 @@ function makePromiseState(promise) {
         },
     );
 
-    result.isPending = function getIsPending() { return isPending; };
+    result.getIsPending = function getIsPending() { return isPending; };
     return result;
 }
 

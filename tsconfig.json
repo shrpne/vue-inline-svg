@@ -1,0 +1,35 @@
+{
+  // from @https://typescript.nuxtjs.org/guide/setup/#configuration
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "skipLibCheck": true,
+    "lib": [
+      "ESNext",
+      "ESNext.AsyncIterable",
+      "DOM"
+    ],
+    "esModuleInterop": true,
+    "allowJs": true,
+    "checkJs": true,
+//    "sourceMap": true,
+    "strict": false,
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [
+        "./*"
+      ],
+      "@/*": [
+        "./*"
+      ]
+    },
+  },
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "types/**/*",
+  ],
+}
