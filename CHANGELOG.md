@@ -1,3 +1,7 @@
+## 2.1.2 - 2023-02-04
+- Fix <title> position: prepend instead of append (#48)
+- Fix `transformSource` .d.ts types (in #50)
+
 ## 2.1.1 - 2022-10-18
 - Fix .d.ts. types to support named exports
 
