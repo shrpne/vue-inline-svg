@@ -176,7 +176,8 @@ function setTitle(svg, title) {
     } else { // create a title element if one doesn't already exist
         const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
         titleEl.textContent = title;
-        svg.appendChild(titleEl);
+        // svg.prepend(titleEl);
+        svg.insertBefore(titleEl, svg.firstChild);
     }
 }
 
