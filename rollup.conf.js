@@ -15,23 +15,18 @@ export default [
                 name: 'VueInlineSvg',
             },
             // {
-            //     format: 'es',
-            //     file: 'dist/vue-inline-svg.esm.js',
+            //     format: 'cjs',
+            //     file: 'dist/vue-inline-svg.cjs',
             // },
-        ],
-    },
-    {
-        input: 'src/index.js',
-        plugins: [
-            babel(),
-            terser(),
-        ],
-        output: [
             {
                 format: 'umd',
                 file: 'dist/vue-inline-svg.min.js',
                 name: 'VueInlineSvg',
-            }
-        ]
-    }
+                globals: {vue: 'Vue'},
+                plugins: [
+                    terser(),
+                ],
+            },
+        ],
+    },
 ]
