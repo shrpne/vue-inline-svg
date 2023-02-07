@@ -1,3 +1,6 @@
+## 3.1.2 - 2023-02-07
+- Fix Webpack and vue-cli import
+
 ## 3.1.1 - 2023-02-04
 - Fix <title> position: prepend instead of append (#48)
 - Fix `transformSource` .d.ts types (in #50)
