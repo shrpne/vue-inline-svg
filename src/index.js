@@ -1,4 +1,4 @@
-/** @type Record<string, PromiseWithState<Element>> */
+/** @type {Record<string, PromiseWithState<Element>>} */
 const cache = {};
 
 /**
@@ -51,10 +51,10 @@ const InlineSvgComponent = {
     },
     data() {
         return {
-            /** @type SVGElement */
+            /** @type {SVGElement} */
             svgElSource: null,
-            /** @type Object */
-            requestObj: {},
+            /** @type {XMLHttpRequest} */
+            request: undefined,
         };
     },
     watch: {
@@ -137,9 +137,9 @@ const InlineSvgComponent = {
             return makePromiseState(new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('GET', url, true);
+                this.request = request;
 
                 request.onload = () => {
-                    this.requestObj = request;
                     if (request.status >= 200 && request.status < 400) {
                         try {
                             // Setup a parser to convert the response to text/xml in order for it to be manipulated and changed
