@@ -2,7 +2,7 @@
 // eslint-disable-next-line import/no-unresolved
 import { h as createElement } from 'vue';
 
-/** @type Record<string, PromiseWithState<Element>> */
+/** @type {Record<string, PromiseWithState<Element>>} */
 const cache = {};
 
 /**
@@ -58,8 +58,10 @@ const InlineSvg = {
     emits: ['loaded', 'unloaded', 'error'],
     data() {
         return {
-            /** @type SVGElement */
+            /** @type {SVGElement} */
             svgElSource: null,
+            /** @type {XMLHttpRequest} */
+            request: undefined,
         };
     },
     watch: {
@@ -142,6 +144,7 @@ const InlineSvg = {
             return makePromiseState(new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('GET', url, true);
+                this.request = request;
 
                 request.onload = () => {
                     if (request.status >= 200 && request.status < 400) {
