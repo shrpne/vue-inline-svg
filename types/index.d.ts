@@ -6,7 +6,7 @@ https://github.com/egoist/vue-dts-gen/blob/4fe43d024b0318a37a30a6b47a718cf910859
 
 import { DefineComponent, ComponentOptionsMixin, VNodeProps, AllowedComponentProps, ComponentCustomProps } from 'vue';
 
-interface InlineSvg {
+export interface InlineSvgProps {
     src: string;
     title?: string;
     transformSource?: (svg: SVGElement) => SVGElement;
@@ -14,7 +14,7 @@ interface InlineSvg {
 }
 
 declare const _default: DefineComponent<
-    InlineSvg,
+    InlineSvgProps,
     unknown,
     unknown,
     {},
@@ -24,6 +24,6 @@ declare const _default: DefineComponent<
     Record<string, any>,
     string,
     VNodeProps & AllowedComponentProps & ComponentCustomProps,
-    InlineSvg
+    InlineSvgProps
 >;
 export default _default;

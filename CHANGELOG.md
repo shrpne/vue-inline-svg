@@ -1,3 +1,9 @@
+## 3.1.4 - 2023-09-17
+- Fix types
+
+## 3.1.3 - 2024-06-11
+- Save request object in component data
+
 ## 3.1.2 - 2023-02-07
 - Fix Webpack and vue-cli import
 
