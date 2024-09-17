@@ -1,5 +1,4 @@
 // peer dep is not installed during test
-// eslint-disable-next-line import/no-unresolved
 import { h as createElement } from 'vue';
 
 /** @type {Record<string, PromiseWithState<Element>>} */
