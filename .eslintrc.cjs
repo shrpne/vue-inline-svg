@@ -3,7 +3,7 @@ module.exports = {
         ecmaVersion: 2020,
     },
     ignorePatterns: [
-        ".eslintrc.js",
+        ".eslintrc.cjs",
         "babel.config.js",
         "rollup.conf.js",
         "demo/**",
