@@ -1,5 +1,8 @@
-// peer dep is not installed during test
-import { h as createElement } from 'vue';
+import { h as createElement, ref, watch, nextTick, defineComponent } from 'vue';
+
+/**
+ * @import { Ref } from 'vue';
+ */
 
 /** @type {Record<string, PromiseWithState<Element>>} */
 const cache = {};
@@ -17,26 +20,9 @@ function filterAttrs(attrs) {
     }, {});
 }
 
-const InlineSvg = {
+const InlineSvg = defineComponent({
     name: 'InlineSvg',
     inheritAttrs: false,
-    render() {
-        if (!this.svgElSource) {
-            return null;
-        }
-        return createElement(
-            'svg',
-            Object.assign(
-                {},
-                // source attrs
-                this.getSvgAttrs(this.svgElSource),
-                // component attrs and listeners
-                filterAttrs(this.$attrs),
-                // content
-                { innerHTML: this.getSvgContent(this.svgElSource) },
-            ),
-        );
-    },
     props: {
         src: {
             type: String,
@@ -55,26 +41,31 @@ const InlineSvg = {
         },
     },
     emits: ['loaded', 'unloaded', 'error'],
-    data() {
-        return {
-            /** @type {SVGElement} */
-            svgElSource: null,
-            /** @type {XMLHttpRequest} */
-            request: undefined,
-        };
-    },
-    watch: {
-        src(newValue) {
+    setup(props, { attrs, emit, expose }) {
+        /** @type {Ref<SVGElement>} */
+        const svgElSource = ref();
+        /** @type {Ref<XMLHttpRequest>} */
+        const requestStored = ref();
+
+        expose({
+            svgElSource,
+            request: requestStored,
+        });
+
+        watch(() => props.src, (newValue) => {
             // re-generate cached svg (`svgElSource`)
-            this.getSource(newValue);
-        },
-    },
-    mounted() {
+            getSource(newValue);
+        });
+
+        // Initial load
         // generate `svgElSource`
-        this.getSource(this.src);
-    },
-    methods: {
-        getSvgAttrs(svgEl) {
+        getSource(props.src);
+
+        /**
+         * @param {SVGElement} svgEl
+         * @return {Record<string, string>|object}
+         */
+        function getSvgAttrs(svgEl) {
             // copy attrs
             let svgAttrs = {};
             const attrs = svgEl.attributes;
@@ -85,65 +76,72 @@ const InlineSvg = {
                 svgAttrs[attrs[i].name] = attrs[i].value;
             }
             return svgAttrs;
-        },
-        getSvgContent(svgEl) {
-            svgEl = svgEl.cloneNode(true);
-            svgEl = this.transformSource(svgEl);
-            if (this.title) {
-                setTitle(svgEl, this.title);
+        }
+
+        /**
+         * @param {SVGElement} svgEl
+         * @return {string}
+         */
+        function getSvgContent(svgEl) {
+            svgEl = /** @type {SVGElement}} */ (svgEl.cloneNode(true));
+            svgEl = props.transformSource(svgEl);
+            if (props.title) {
+                setTitle(svgEl, props.title);
             }
 
             // copy inner html
             return svgEl.innerHTML;
-        },
+        }
+
         /**
          * Get svgElSource
          * @param {string} src
          */
-        getSource(src) {
+        function getSource(src) {
             // fill cache by src with promise
             if (!cache[src]) {
                 // download
-                cache[src] = this.download(src);
+                cache[src] = download(src);
             }
+
             // notify svg is unloaded
-            if (this.svgElSource && cache[src].getIsPending() && !this.keepDuringLoading) {
-                this.svgElSource = null;
-                this.$emit('unloaded');
+            if (svgElSource.value && cache[src].getIsPending() && !props.keepDuringLoading) {
+                svgElSource.value = null;
+                emit('unloaded');
             }
 
             // inline svg when cached promise resolves
             cache[src]
                 .then((svg) => {
-                    this.svgElSource = svg;
+                    svgElSource.value = svg;
                     // wait to render
-                    this.$nextTick(() => {
+                    nextTick(() => {
                         // notify
-                        this.$emit('loaded', this.$el);
+                        emit('loaded', document.querySelector('svg'));
                     });
                 })
                 .catch((err) => {
                     // notify svg is unloaded
-                    if (this.svgElSource) {
-                        this.svgElSource = null;
-                        this.$emit('unloaded');
+                    if (svgElSource.value) {
+                        svgElSource.value = undefined;
+                        emit('unloaded');
                     }
                     // remove cached rejected promise so next image can try load again
                     delete cache[src];
-                    this.$emit('error', err);
+                    emit('error', err);
                 });
-        },
+        }
 
         /**
          * Get the contents of the SVG
          * @param {string} url
          * @returns {PromiseWithState<Element>}
          */
-        download(url) {
+        function download(url) {
             return makePromiseState(new Promise((resolve, reject) => {
                 const request = new XMLHttpRequest();
                 request.open('GET', url, true);
-                this.request = request;
+                requestStored.value = request;
 
                 request.onload = () => {
                     if (request.status >= 200 && request.status < 400) {
@@ -169,9 +167,30 @@ const InlineSvg = {
                 request.onerror = reject;
                 request.send();
             }));
-        },
+        }
+
+
+
+        return () => {
+            if (!svgElSource.value) {
+                return null;
+            }
+
+            return createElement(
+                'svg',
+                Object.assign(
+                    {},
+                    // source attrs
+                    getSvgAttrs(svgElSource.value),
+                    // component attrs and listeners
+                    filterAttrs(attrs),
+                    // content
+                    { innerHTML: getSvgContent(svgElSource.value) },
+                ),
+            );
+        };
     },
-};
+});
 
 /**
  * Create or edit the <title> element of a SVG
@@ -221,7 +240,9 @@ function makePromiseState(promise) {
         },
     );
 
-    result.getIsPending = function getIsPending() { return isPending; };
+    result.getIsPending = function getIsPending() {
+        return isPending;
+    };
     return result;
 }
 

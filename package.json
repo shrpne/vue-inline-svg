@@ -24,9 +24,10 @@
   ],
   "scripts": {
     "build": "rollup -c rollup.conf.js",
-    "test": "npm run lint && npm run test:ts",
+    "test": "npm run lint && npm run test:ts && npm run test:vitest",
     "test:ts": "npm run test:prepare && tsc -p .",
-    "test:dts": "npm run test:prepare && check-dts test/*.ts",
+    "test:dts": "npm run test:prepare && check-dts test/*.types.ts",
+    "test:vitest": "vitest run",
     "test:prepare": "npm i vue@3 --no-save",
     "lint": "eslint src/*.js",
     "lint:fix": "eslint src/*.js --fix",
@@ -63,11 +64,15 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@typescript-eslint/eslint-plugin": "^8.6.0",
     "@typescript-eslint/parser": "^8.6.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
     "check-dts": "^0.8.2",
     "eslint": "^9.10.0",
     "globals": "^15.9.0",
+    "happy-dom": "^16.8.1",
     "pre-commit": "^1.2.2",
     "rollup": "^4.21.3",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "vitest": "^3.0.4"
   }
 }

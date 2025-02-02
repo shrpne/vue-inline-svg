@@ -15,7 +15,10 @@
     "checkJs": true,
 //    "sourceMap": true,
     "strict": false,
-    "noEmit": true,
+//    "noEmit": true,
+    "declaration": true,
+    "declarationDir": "./types/gen",
+    "emitDeclarationOnly": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
@@ -29,7 +32,7 @@
   },
   "include": [
     "src/**/*",
-    "test/**/*",
+//    "test/**/*",
     "types/**/*",
   ],
 }
