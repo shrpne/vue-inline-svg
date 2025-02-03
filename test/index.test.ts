@@ -33,8 +33,9 @@ class MockXMLHttpRequest {
     }
 
     _loadResponse(): void {
-        if (svgContentMap[this.url]) {
-            this.responseText = svgContentMap[this.url];
+        const [path, query] = this.url.split('?');
+        if (svgContentMap[path]) {
+            this.responseText = svgContentMap[path];
             this.status = 200;
         } else {
             // this.responseText = 'Not Found';
@@ -49,8 +50,6 @@ class MockXMLHttpRequest {
 }
 
 describe('InlineSvg', () => {
-
-
     vi.stubGlobal('XMLHttpRequest', MockXMLHttpRequest);
 
     vi.stubGlobal('DOMParser', function() {
@@ -107,17 +106,12 @@ describe('InlineSvg', () => {
     it('exposes svgElSource and request values', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
-                src: 'test.svg',
+                // add query to bypass cache and always have request exposed
+                src: 'test.svg?' + Math.random(),
             },
         });
         await waitForSvgLoad();
         expect(typeof wrapper.vm.svgElSource).toBe('object');
-
-        // request notexistent to bypass cache
-        wrapper.setProps({
-            src: 'notexistent.svg',
-        });
-        await waitForSvgLoad();
         expect(typeof wrapper.vm.request).toBe('object');
     });
 
@@ -196,7 +190,7 @@ describe('InlineSvg', () => {
     });
 
     // @TODO must clear svg load cache to test it properly
-    it.skip('handles keepDuringLoading prop correctly', async () => {
+    it('handles keepDuringLoading prop correctly', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
                 src: 'test.svg',
@@ -206,10 +200,11 @@ describe('InlineSvg', () => {
 
         await waitForSvgLoad();
 
+        console.log(wrapper.vm);
         console.log('loadXhrWithDelay = true');
         MockXMLHttpRequest.loadXhrWithDelay = true;
-        // Change src to trigger a new load
-        await wrapper.setProps({ src: 'poly.svg' });
+        // Change src to trigger a new load (with cache-bust query)
+        await wrapper.setProps({ src: 'poly.svg?' + Math.random()  });
         await nextTick();
         console.log('check', wrapper.html(), wrapper.find('svg').exists());
 

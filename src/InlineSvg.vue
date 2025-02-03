@@ -44,9 +44,9 @@ const emit = defineEmits(['loaded', 'unloaded', 'error']);
 
 const attrs = useAttrs();
 
-/** @type {Ref < SVGElement >} */
+/** @type {Ref <SVGElement>} */
 const svgElSource = ref();
-/** @type {Ref < XMLHttpRequest >} */
+/** @type {Ref <XMLHttpRequest>} */
 const requestStored = ref();
 
 defineExpose({

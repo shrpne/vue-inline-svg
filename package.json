@@ -26,6 +26,7 @@
   ],
   "scripts": {
     "build": "rollup -c rollup.conf.js",
+    "emit-dts": "vue-tsc -p tsconfig.dts.json",
     "test": "npm run lint && npm run test:ts && npm run test:vitest",
     "test:ts": "npm run test:prepare && vue-tsc -p .",
     "test:dts": "npm run test:prepare && check-dts test/*.types.ts",
@@ -33,7 +34,7 @@
     "test:prepare": "npm i vue@3 --no-save",
     "lint": "eslint . --no-error-on-unmatched-pattern --no-warn-ignored",
     "lint:fix": "npm run lint -- --fix",
-    "prepublishOnly": "npm run test && npm run build",
+    "prepublishOnly": "npm run test && npm run emit-dts && npm run build",
     "precommit": "echo 'Pre-commit checks...' && npm run lint"
   },
   "pre-commit": [
