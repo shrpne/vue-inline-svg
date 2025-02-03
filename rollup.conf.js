@@ -1,13 +1,15 @@
 import {babel} from '@rollup/plugin-babel';
 import terser from '@rollup/plugin-terser';
+import vue from '@vitejs/plugin-vue';
 
 
 export default [
     {
-        input: 'src/index.js',
+        input: 'src/InlineSvg.vue',
         external: ['vue'],
         plugins: [
             babel(),
+            vue(),
         ],
         output: [
             {
@@ -15,6 +17,10 @@ export default [
                 file: 'dist/vue-inline-svg.js',
                 name: 'VueInlineSvg',
                 globals: {vue: 'Vue'},
+            },
+            {
+                format: 'es',
+                file: 'dist/vue-inline-svg.mjs',
             },
             // {
             //     format: 'cjs',
@@ -31,4 +37,4 @@ export default [
             },
         ],
     },
-]
+];

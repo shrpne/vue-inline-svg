@@ -1,84 +1,74 @@
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest';
-import InlineSvg from '../src/index.js';
+import InlineSvg from '../src/InlineSvg.vue';
 
-interface SvgContentMap {
-    [key: string]: string;
-}
 
-interface MockXMLHttpRequest {
-    onload: () => void;
-    onerror: () => void;
-    status: number;
-    url: string;
-    responseText: string;
-    open: (method: string, url: string) => void;
-    send: () => void;
-    _loadResponse: () => void;
+const svgContentMap = {
+    'test.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/></svg>',
+    'rect.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="50" y="50" width="100" height="100"/></svg>',
+    'poly.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150"><polygon points="75,20 150,130 0,130"/></svg>',
+};
+
+class MockXMLHttpRequest {
+    static loadXhrWithDelay = false;
+    onload: () => void = () => {
+    };
+    onerror: () => void = () => {
+    };
+    status: number = 200;
+    url: string = '';
+    responseText: string = '';
+
+    open(_method: string, url: string): void {
+        this.url = url;
+    }
+
+    send(): void {
+        if (MockXMLHttpRequest.loadXhrWithDelay) {
+            setTimeout(() => this._loadResponse(), 500);
+        } else {
+            this._loadResponse();
+        }
+    }
+
+    _loadResponse(): void {
+        if (svgContentMap[this.url]) {
+            this.responseText = svgContentMap[this.url];
+            this.status = 200;
+        } else {
+            // this.responseText = 'Not Found';
+            this.status = 404;
+        }
+        if (this.status === 200) {
+            this.onload?.();
+        } else {
+            this.onerror?.();
+        }
+    }
 }
 
 describe('InlineSvg', () => {
-    const svgContentMap: SvgContentMap = {
-        'test.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/></svg>',
-        'rect.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="50" y="50" width="100" height="100"/></svg>',
-        'poly.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150"><polygon points="75,20 150,130 0,130"/></svg>'
-    };
 
-    vi.stubGlobal('XMLHttpRequest', class {
-        static loadXhrWithDelay = false;
-        onload: () => void = () => {
-        };
-        onerror: () => void = () => {
-        };
-        status: number = 200;
-        url: string = '';
-        responseText: string = '';
 
-        open(_method: string, url: string): void {
-            this.url = url;
-        }
+    vi.stubGlobal('XMLHttpRequest', MockXMLHttpRequest);
 
-        send(): void {
-            if (globalThis.XMLHttpRequest.loadXhrWithDelay) {
-                setTimeout(() => this._loadResponse(), 500);
-            } else {
-                this._loadResponse();
-            }
-        }
-
-        _loadResponse(): void {
-            if (svgContentMap[this.url]) {
-                this.responseText = svgContentMap[this.url];
-                this.status = 200;
-            } else {
-                // this.responseText = 'Not Found';
-                this.status = 404;
-            }
-            if (this.status === 200) {
-                this.onload && this.onload();
-            } else {
-                this.onerror && this.onerror();
-            }
-        }
-    });
-
-    vi.stubGlobal('DOMParser', function () {
+    vi.stubGlobal('DOMParser', function() {
         return {
-            parseFromString: function (text: string) {
+            parseFromString: function(text: string) {
                 const mockSvgElementContainer = document.createElement('div');
                 mockSvgElementContainer.innerHTML = text;
                 return mockSvgElementContainer;
-            }
+            },
         };
-    })
+    });
 
     beforeEach((ctx) => {
         console.log('TITLE:', ctx.task.name);
 
         // reset
         console.log('loadXhrWithDelay = false');
-        globalThis.XMLHttpRequest.loadXhrWithDelay = false;
+        MockXMLHttpRequest.loadXhrWithDelay = false;
     });
 
     afterEach(() => {
@@ -86,7 +76,7 @@ describe('InlineSvg', () => {
     });
 
     async function waitForSvgLoad(): Promise<void> {
-        if (globalThis.XMLHttpRequest.loadXhrWithDelay) {
+        if (MockXMLHttpRequest.loadXhrWithDelay) {
             await wait(1000);
         }
         await nextTick();
@@ -97,8 +87,8 @@ describe('InlineSvg', () => {
     it('renders SVG when src is provided', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
-                src: 'test.svg'
-            }
+                src: 'test.svg',
+            },
         });
         await waitForSvgLoad();
         expect(wrapper.html()).toContain('svg');
@@ -107,8 +97,8 @@ describe('InlineSvg', () => {
     it('renders nothing when src is not provided', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
-                src: ''
-            }
+                src: '',
+            },
         });
         await waitForSvgLoad();
         expect(wrapper.find('svg').exists()).toBe(false);
@@ -117,8 +107,8 @@ describe('InlineSvg', () => {
     it('exposes svgElSource and request values', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
-                src: 'test.svg'
-            }
+                src: 'test.svg',
+            },
         });
         await waitForSvgLoad();
         expect(typeof wrapper.vm.svgElSource).toBe('object');
@@ -134,8 +124,8 @@ describe('InlineSvg', () => {
     it('emits loaded event after successful SVG load', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
-                src: 'test.svg'
-            }
+                src: 'test.svg',
+            },
         });
         await waitForSvgLoad();
         const emitted = wrapper.emitted();
@@ -145,8 +135,8 @@ describe('InlineSvg', () => {
     it('emits error event on SVG load failure', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
-                src: 'nonexistent.svg'
-            }
+                src: 'nonexistent.svg',
+            },
         });
         await waitForSvgLoad();
         const emitted = wrapper.emitted();
@@ -162,8 +152,8 @@ describe('InlineSvg', () => {
         const wrapper = mount(InlineSvg, {
             props: {
                 src: 'test.svg',
-                transformSource
-            }
+                transformSource,
+            },
         });
 
         await waitForSvgLoad();
@@ -175,8 +165,8 @@ describe('InlineSvg', () => {
     it('updates SVG when src prop changes', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
-                src: 'rect.svg'
-            }
+                src: 'rect.svg',
+            },
         });
 
         await waitForSvgLoad();
@@ -194,8 +184,8 @@ describe('InlineSvg', () => {
         const wrapper = mount(InlineSvg, {
             props: {
                 src: 'test.svg',
-                title: 'Test Title'
-            }
+                title: 'Test Title',
+            },
         });
 
         await waitForSvgLoad();
@@ -210,14 +200,14 @@ describe('InlineSvg', () => {
         const wrapper = mount(InlineSvg, {
             props: {
                 src: 'test.svg',
-                keepDuringLoading: false
+                keepDuringLoading: false,
             },
         });
 
         await waitForSvgLoad();
 
         console.log('loadXhrWithDelay = true');
-        globalThis.XMLHttpRequest.loadXhrWithDelay = true;
+        MockXMLHttpRequest.loadXhrWithDelay = true;
         // Change src to trigger a new load
         await wrapper.setProps({ src: 'poly.svg' });
         await nextTick();

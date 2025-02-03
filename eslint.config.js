@@ -1,58 +1,54 @@
-import js from "@eslint/js";
-// import { FlatCompat } from '@eslint/eslintrc';
-import globals from "globals";
-import typescriptEslintParser from '@typescript-eslint/parser';
-import typescriptEslintPlugin from '@typescript-eslint/eslint-plugin';
+// @see https://dev.to/devidev/setting-up-eslint-9130-with-prettier-typescript-vuejs-and-vscode-autosave-autoformat-n0
 
-// const compat = new FlatCompat();
+import globals from 'globals';
+import pluginJs from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import pluginVue from 'eslint-plugin-vue';
 
-/**
- * @type {import('eslint').Linter.FlatConfig[]}
- */
+/** @type {import('eslint').Linter.Config[]} */
 const config = [
     {
         ignores: [
-            ".eslintrc.cjs",
-            "babel.config.js",
-            "rollup.conf.js",
+            '**/*.d.ts',
             "demo/**",
             "dist/**",
             "node_modules/**",
         ],
     },
     {
-        files: ["**/*.{ts}"],
         languageOptions: {
             globals: {
                 ...globals.browser,
-                // ...globals.node,
-                // myCustomGlobal: "readonly"
+                ...globals.node,
             },
-            parser: typescriptEslintParser,
-            parserOptions: {
-                project: './tsconfig.json',
-            },
-        },
-        plugins: {
-            '@typescript-eslint': typescriptEslintPlugin,
-        },
-        rules: {
-            ...js.configs.recommended.rules,
-            ...typescriptEslintPlugin.configs.recommended.rules,
         },
     },
+    // js
+    pluginJs.configs.recommended,
+    // ts
+    ...tseslint.configs.recommended,
+    // vue
+    ...pluginVue.configs['flat/recommended'],
     {
-        files: ["**/*.{js,mjc,cjs}"],
+        files: ['*.vue', '**/*.vue'],
         languageOptions: {
-            globals: {
-                ...globals.browser,
-                // ...globals.node,
-                // myCustomGlobal: "readonly"
+            parserOptions: {
+                parser: tseslint.parser,
             },
         },
+    },
+    // rules override
+    {
         rules: {
-            ...js.configs.recommended.rules,
             indent: ['error', 4, { SwitchCase: 1 }],
+            semi: ["error", "always"],
+            "comma-dangle": ["error", "always-multiline"],
+            "arrow-parens": ["error", "always"],
+            "space-before-function-paren": ["error", {
+                anonymous: "never",
+                named: "never",
+                asyncArrow: "always",
+            }],
             'max-len': ['off'],
             'no-param-reassign': ['off'],
             'no-use-before-define': ['off'],
@@ -63,6 +59,13 @@ const config = [
             // allow extension in imports
             'import/extensions': 'off',
             'prefer-object-spread': 'off',
+
+
+            '@typescript-eslint/no-unused-vars': 'off',
+
+
+            'vue/html-closing-bracket-spacing': 0,
+            'vue/html-indent': ['error', 4],
         },
     },
 ];

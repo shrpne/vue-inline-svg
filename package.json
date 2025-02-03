@@ -5,15 +5,17 @@
   "type": "module",
   "exports": {
     ".": {
-      "module": "./src/index.js",
-      "import": "./src/index.js",
+      "module": "./dist/vue-inline-svg.mjs",
+      "import": "./dist/vue-inline-svg.mjs",
       "types": "./types/index.d.ts",
       "default": "./dist/vue-inline-svg.js"
     },
+    "./InlineSvg": "./src/InlineSvg.vue",
+    "./InlineSvg.vue": "./src/InlineSvg.vue",
     "./*": "./*"
   },
   "main": "dist/vue-inline-svg.js",
-  "module": "src/index.js",
+  "module": "dist/vue-inline-svg.mjs",
   "browser": "dist/vue-inline-svg.js",
   "unpkg": "dist/vue-inline-svg.min.js",
   "types": "types/index.d.ts",
@@ -25,12 +27,12 @@
   "scripts": {
     "build": "rollup -c rollup.conf.js",
     "test": "npm run lint && npm run test:ts && npm run test:vitest",
-    "test:ts": "npm run test:prepare && tsc -p .",
+    "test:ts": "npm run test:prepare && vue-tsc -p .",
     "test:dts": "npm run test:prepare && check-dts test/*.types.ts",
     "test:vitest": "vitest run",
     "test:prepare": "npm i vue@3 --no-save",
-    "lint": "eslint src/*.js",
-    "lint:fix": "eslint src/*.js --fix",
+    "lint": "eslint . --no-error-on-unmatched-pattern --no-warn-ignored",
+    "lint:fix": "npm run lint -- --fix",
     "prepublishOnly": "npm run test && npm run build",
     "precommit": "echo 'Pre-commit checks...' && npm run lint"
   },
@@ -56,23 +58,23 @@
     "vue": "^3"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@babel/preset-env": "^7.25.4",
-    "@eslint/eslintrc": "^3.1.0",
-    "@eslint/js": "^9.10.0",
+    "@babel/core": "^7.26.7",
+    "@babel/preset-env": "^7.26.7",
+    "@eslint/js": "^9.19.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-terser": "^0.4.4",
-    "@typescript-eslint/eslint-plugin": "^8.6.0",
-    "@typescript-eslint/parser": "^8.6.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/test-utils": "^2.4.6",
     "check-dts": "^0.8.2",
-    "eslint": "^9.10.0",
-    "globals": "^15.9.0",
+    "eslint": "^9.19.0",
+    "eslint-plugin-vue": "^9.32.0",
+    "globals": "^15.14.0",
     "happy-dom": "^16.8.1",
     "pre-commit": "^1.2.2",
-    "rollup": "^4.21.3",
-    "typescript": "^5.6.2",
-    "vitest": "^3.0.4"
+    "rollup": "^4.34.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.22.0",
+    "vitest": "^3.0.5",
+    "vue-tsc": "^2.2.0"
   }
 }
