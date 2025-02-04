@@ -24,12 +24,16 @@ interface Props {
     title?: string;
     transformSource?: (svg: SVGElement) => SVGElement;
     keepDuringLoading?: boolean;
+    uniqueIds?: boolean|string;
+    uniqueIdsBase?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
     title: undefined,
     transformSource: (svg: SVGElement) => svg,
     keepDuringLoading: true,
+    uniqueIds: false,
+    uniqueIdsBase: '',
 });
 
 const emit = defineEmits<{
@@ -44,6 +48,7 @@ const attrs = useAttrs();
 const svgElSource = ref<SVGElement>();
 /** @type {Ref<XMLHttpRequest>} */
 const requestStored = ref<XMLHttpRequest>();
+const uniqueIdHash = Math.random().toString(36).substring(2);
 
 defineExpose({
     svgElSource,
@@ -82,6 +87,10 @@ function getSvgAttrs(svgEl: SVGElement): Record<string, string> {
  */
 function getSvgContent(svgEl: SVGElement): string {
     svgEl = /** @type {SVGElement}} */ (svgEl.cloneNode(true) as SVGElement);
+    if (props.uniqueIds) {
+        const hash = typeof props.uniqueIds === 'string' ? props.uniqueIds : uniqueIdHash;
+        svgEl = setUniqueIds(svgEl, hash, props.uniqueIdsBase);
+    }
     svgEl = props.transformSource(svgEl);
     if (props.title) {
         setTitle(svgEl, props.title);
@@ -201,6 +210,49 @@ function setTitle(svg: SVGElement, title: string): void {
         svg.insertBefore(titleEl, svg.firstChild);
     }
 }
+
+function setUniqueIds(
+    node: SVGElement,
+    hash: string,
+    baseURL = '',
+): SVGElement {
+    const replaceableAttributes = ['id', 'href', 'xlink:href', 'xlink:role', 'xlink:arcrole'];
+    const linkAttributes = ['href', 'xlink:href'];
+    const isDataValue = (name: string, value: string) => {
+        return linkAttributes.includes(name) && (value ? !value.includes('#') : false);
+    };
+
+    [...node.children].forEach((el) => {
+        if (el.attributes?.length) {
+            const attributes = Object.values(el.attributes).map((attr) => {
+                const match = /url\((.*?)\)/.exec(attr.value);
+
+                if (match?.[1]) {
+                    attr.value = attr.value.replace(match[0], `url(${baseURL}${match[1]}_${hash})`);
+                }
+
+                return attr;
+            });
+
+            replaceableAttributes.forEach((replaceableAttrName) => {
+                const attribute = attributes.find((attr) => attr.name === replaceableAttrName);
+
+                if (attribute && !isDataValue(replaceableAttrName, attribute.value)) {
+                    attribute.value = `${attribute.value}_${hash}`;
+                }
+            });
+        }
+
+        if (el.children.length) {
+            return setUniqueIds(el as SVGElement, hash, baseURL);
+        }
+
+        return el;
+    });
+
+    return node;
+}
+
 </script>
 
 <template>

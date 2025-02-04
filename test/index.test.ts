@@ -218,7 +218,6 @@ describe('InlineSvg', () => {
         expect(svg.attributes('xmlns')).toBe('http://www.w3.org/2000/svg');
     });
 
-    // @TODO must clear svg load cache to test it properly
     it('handles keepDuringLoading prop correctly', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
@@ -296,7 +295,66 @@ describe('InlineSvg', () => {
         // Should attempt to load again since previous attempt failed and was cleared from cache
         expect(MockXMLHttpRequest.callCount).toBe(2);
     });
+
+    describe('uniqueIds', () => {
+        svgContentMap['unique-ids.svg'] = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><linearGradient id="gradient"><stop offset="0%" stop-color="red"/></linearGradient></defs><circle id="circle" fill="url(#gradient)" cx="50" cy="50" r="40"/></svg>';
+
+        it('makes IDs unique when uniqueIds is true', async () => {
+            const wrapper = mount(InlineSvg, {
+                props: {
+                    src: 'unique-ids.svg',
+                    uniqueIds: true,
+                },
+            });
+            await waitForSvgLoad();
+
+            const svg = wrapper.find('svg');
+            const circle = svg.find('circle');
+            const gradient = svg.find('linearGradient');
+
+            // check correct hash set on <linearGradient>
+            const id = gradient.attributes('id');
+            const match = id.match(/gradient(_[a-z0-9]+)/);
+            const idSuffix = match ? match[1] : null;
+            expect(idSuffix).not.toBeNull();
+
+            // Check that the reference has been updated
+            expect(circle.attributes('fill')).toMatch(`url(#gradient${idSuffix})`);
+        });
+
+        it('uses custom hash for uniqueIds when string is provided', async () => {
+            const wrapper = mount(InlineSvg, {
+                props: {
+                    src: 'unique-ids.svg',
+                    uniqueIds: 'custom-hash',
+                },
+            });
+            await waitForSvgLoad();
+
+            const circle = wrapper.find('circle');
+            expect(circle.attributes('id')).toBe('circle_custom-hash');
+            expect(circle.attributes('fill')).toBe('url(#gradient_custom-hash)');
+        });
+
+        it('handles uniqueIds with baseURL', async () => {
+            svgContentMap['base-url.svg'] = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><use href="/assets/icons.svg#icon" xlink:href="/sprites.svg#sprite"/></svg>';
+
+            const wrapper = mount(InlineSvg, {
+                props: {
+                    src: 'unique-ids.svg',
+                    uniqueIds: 'test-hash',
+                    uniqueIdsBase: 'https://example.com/',
+                },
+            });
+            await waitForSvgLoad();
+
+            const circle = wrapper.find('circle');
+            expect(circle.attributes('fill')).toBe('url(https://example.com/#gradient_test-hash)');
+        });
+    });
+
 });
+
 
 function wait(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));

@@ -2,6 +2,7 @@
 
 [![NPM Package](https://img.shields.io/npm/v/vue-inline-svg.svg?style=flat-square)](https://www.npmjs.org/package/vue-inline-svg)
 [![Minified Size](https://img.shields.io/bundlephobia/min/vue-inline-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-inline-svg)
+[![Gzipped Size](https://img.shields.io/bundlephobia/minzip/vue-inline-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-inline-svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://github.com/shrpne/vue-inline-svg/blob/master/LICENSE)
 
 Vue component loads an SVG source dynamically and inline `<svg>` so you can manipulate the style of it with CSS or JS.
@@ -22,6 +23,8 @@ Check old version [vue-inline-svg@2](https://github.com/shrpne/vue-inline-svg/tr
   - [props](#props)
     - [src](#--src)
     - [title](#--title)
+    - [uniqueIds](#--uniqueids)
+    - [uniqueIdsBase](#--uniqueidsbaase)
     - [keepDuringLoading](#--keepduringloading)
     - [transformSource](#--transformsource)
   - [SVG attributes](#svg-attributes)
@@ -99,6 +102,8 @@ app.component('inline-svg', VueInlineSvg);
 
 ### props
 #### - `src`
+Type: `string` **Required**
+
 Path to SVG file
 
 ```html
@@ -110,11 +115,14 @@ Note: if you use vue-loader assets or vue-cli, then paths like '../assets/my.svg
 <inline-svg :src="require('../assets/my.svg')"/>
 ```
 Learn more:
-- https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
-- https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
+- vite: https://vite.dev/guide/assets.html
+- vue-loader: https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
+- vue-cli: https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
 
 
 #### - `title`
+Type: `string`
+
 Sets/overwrites the `<title>` of the SVG
 
 ```html
@@ -122,15 +130,41 @@ Sets/overwrites the `<title>` of the SVG
 ```
 
 
+#### - `uniqueIds`
+Type: `boolean | string`
+
+Add suffix to all IDs in SVG to eliminate conflicts for multiple SVGs with the same source. If `true` - suffix is random string, if `string` - suffix is this string.
+
+```html
+<inline-svg :src="image.svg" :uniqueIds="true"/>
+<inline-svg :src="image.svg" uniqueIds="my-unique-suffix"/>
+```
+
+
+#### - `uniqueIdsBase`
+Type: `string`
+
+An URL to prefix each ID in case you use the `<base>` tag and `uniqueIds`.
+
+```html
+<inline-svg :src="image.svg" :uniqueIds="true" uniqueIdsBase="http://example.com""/>
+```
+
+
 #### - `keepDuringLoading`
-`true` by default. It makes vue-inline-svg to preserve old image visible, when new image is being loaded. Pass `false` to disable it and show nothing during loading.
+Type: `boolean`; Default: `true`
+
+It makes vue-inline-svg to preserve old image visible, when new image is being loaded. Pass `false` to disable it and show nothing during loading.
 
 ```html
 <inline-svg :src="image.svg" :keepDuringLoading="false"/>
 ```
 
+
 #### - `transformSource`
-Function to transform SVG source
+Type: `(svg: SVGElement) => SVGElement`
+
+Function to transform SVG content
 
 This example create circle in svg:
 ```html
