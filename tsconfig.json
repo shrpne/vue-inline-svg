@@ -15,6 +15,7 @@
     "checkJs": true,
 //    "sourceMap": true,
     "strict": false,
+    "allowImportingTsExtensions": true,
     "noEmit": true,
     "declaration": true,
     "declarationDir": "./types",

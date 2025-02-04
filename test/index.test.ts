@@ -11,11 +11,13 @@ const svgContentMap = {
 };
 
 class MockXMLHttpRequest {
+    static callCount: number = 0;
     static loadXhrWithDelay = false;
-    onload: () => void = () => {
-    };
-    onerror: () => void = () => {
-    };
+    constructor() {
+        MockXMLHttpRequest.callCount += 1;
+    }
+    onload() {};
+    onerror() {};
     status: number = 200;
     url: string = '';
     responseText: string = '';
@@ -227,7 +229,6 @@ describe('InlineSvg', () => {
 
         await waitForSvgLoad();
 
-        console.log(wrapper.vm);
         console.log('loadXhrWithDelay = true');
         MockXMLHttpRequest.loadXhrWithDelay = true;
         // Change src to trigger a new load (with cache-bust query)
@@ -244,6 +245,56 @@ describe('InlineSvg', () => {
 
         // Verify new SVG is loaded
         expect(wrapper.find('svg').exists()).toBe(true);
+    });
+    it('caches SVG after loading and reuses it', async () => {
+        const cacheBustHash = Math.random();
+        const src = `test.svg?${cacheBustHash}`;
+
+        // Create spy on XMLHttpRequest
+        MockXMLHttpRequest.callCount = 0;
+        const wrapper = mount(InlineSvg, {
+            props: {
+                src,
+            },
+        });
+        await waitForSvgLoad();
+
+        expect(MockXMLHttpRequest.callCount).toBe(1);
+        expect(wrapper.html()).toContain('svg');
+
+        // Mount another component with same src
+        const wrapper2 = mount(InlineSvg, {
+            props: {
+                src,
+            },
+        });
+        await waitForSvgLoad();
+
+        // Should use cached version without new XHR request
+        expect(MockXMLHttpRequest.callCount).toBe(1);
+        expect(wrapper2.html()).toContain('svg');
+    });
+
+    it('clears cache on error and allows retry', async () => {
+        // First attempt with non-existent SVG
+        MockXMLHttpRequest.callCount = 0;
+        const wrapper = mount(InlineSvg, {
+            props: {
+                src: 'nonexistent.svg',
+            },
+        });
+        await waitForSvgLoad();
+
+        // Try loading same non-existent SVG again
+        const wrapper2 = mount(InlineSvg, {
+            props: {
+                src: 'nonexistent.svg',
+            },
+        });
+        await waitForSvgLoad();
+
+        // Should attempt to load again since previous attempt failed and was cleared from cache
+        expect(MockXMLHttpRequest.callCount).toBe(2);
     });
 });
 

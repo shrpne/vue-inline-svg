@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { h as createElement, ref, watch, nextTick, useAttrs } from "vue";
+import {cache, makePromiseState, type PromiseWithState} from "./cache.ts";
 
 /**
  * @import { Ref } from 'vue';
  */
-
-/** @type {Record<string, PromiseWithState<Element>>} */
-const cache: Record<string, PromiseWithState<Element>> = {};
 
 /**
  * Remove false attrs
@@ -202,47 +200,6 @@ function setTitle(svg: SVGElement, title: string): void {
         // svg.prepend(titleEl);
         svg.insertBefore(titleEl, svg.firstChild);
     }
-}
-
-interface PromiseWithState<T> extends Promise<T> {
-    getIsPending: () => boolean;
-}
-
-function isPromiseWithState<T>(promise: Promise<T> | PromiseWithState<T>): promise is PromiseWithState<T> {
-    return promise['getIsPending'] !== undefined;
-}
-
-/**
- * This function allow you to modify a JS Promise by adding some status properties.
- * @template {any} T
- * @param {Promise<T>|PromiseWithState<T>} promise
- * @return {PromiseWithState<T>}
- */
-function makePromiseState<T>(promise: Promise<T> | PromiseWithState<T>): PromiseWithState<T> {
-    // Don't modify any promise that has been already modified.
-    if (isPromiseWithState(promise)) {
-        return promise;
-    }
-
-    // Set initial state
-    let isPending = true;
-
-    // Observe the promise, saving the fulfillment in a closure scope.
-    let result = promise.then(
-        (v) => {
-            isPending = false;
-            return v;
-        },
-        (e) => {
-            isPending = false;
-            throw e;
-        },
-    ) as PromiseWithState<T>;
-
-    result.getIsPending = function getIsPending() {
-        return isPending;
-    };
-    return result;
 }
 </script>
 
