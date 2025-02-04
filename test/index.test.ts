@@ -138,7 +138,7 @@ describe('InlineSvg', () => {
     });
 
     it('applies transformSource function to SVG', async () => {
-        const transformSource = vi.fn((svg: Element) => {
+        const transformSource = vi.fn((svg: SVGElement) => {
             svg.appendChild(document.createElement('path'));
             return svg;
         });
@@ -187,6 +187,33 @@ describe('InlineSvg', () => {
         const titleElement = wrapper.find('title');
         expect(titleElement.exists()).toBe(true);
         expect(titleElement.text()).toBe('Test Title');
+    });
+
+    it('correctly merges attributes with root SVG element', async () => {
+        const wrapper = mount(InlineSvg, {
+            props: {
+                src: 'test.svg',
+            },
+            attrs: {
+                class: 'custom-class',
+                width: '200',
+                height: '200',
+                'data-test': 'test-value',
+                viewBox: '0 0 200 200', // This should override the original viewBox
+            },
+        });
+
+        await waitForSvgLoad();
+
+        const svg = wrapper.find('svg');
+        expect(svg.exists()).toBe(true);
+        expect(svg.classes()).toContain('custom-class');
+        expect(svg.attributes('width')).toBe('200');
+        expect(svg.attributes('height')).toBe('200');
+        expect(svg.attributes('data-test')).toBe('test-value');
+        expect(svg.attributes('viewBox')).toBe('0 0 200 200');
+        // Ensure original SVG attributes are preserved when not overridden
+        expect(svg.attributes('xmlns')).toBe('http://www.w3.org/2000/svg');
     });
 
     // @TODO must clear svg load cache to test it properly

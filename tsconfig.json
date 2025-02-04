@@ -17,7 +17,8 @@
     "strict": false,
     "noEmit": true,
     "declaration": true,
-    "declarationDir": "./types/gen",
+    "declarationDir": "./types",
+    "declarationMap": true,
     "emitDeclarationOnly": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
@@ -28,11 +29,11 @@
       "@/*": [
         "./*"
       ]
-    },
+    }
   },
   "include": [
     "src/**/*",
     "test/**/*",
-    "types/**/*",
-  ],
+    "types/**/*"
+  ]
 }

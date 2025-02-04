@@ -1,5 +1,6 @@
 /dist/*
 !/dist/package.json
+/types/
 
 node_modules/
 yarn.lock

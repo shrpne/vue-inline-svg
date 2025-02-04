@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { h as createElement, ref, watch, nextTick, useAttrs } from "vue";
 
 /**
@@ -6,48 +6,46 @@ import { h as createElement, ref, watch, nextTick, useAttrs } from "vue";
  */
 
 /** @type {Record<string, PromiseWithState<Element>>} */
-const cache = {};
+const cache: Record<string, PromiseWithState<Element>> = {};
 
 /**
  * Remove false attrs
  * @param {Object} attrs
  */
-function filterAttrs(attrs) {
+function filterAttrs(attrs: Record<string, unknown>): Record<string, unknown> {
     return Object.keys(attrs).reduce((result, key) => {
         if (attrs[key] !== false && attrs[key] !== null && attrs[key] !== undefined) {
             result[key] = attrs[key];
         }
         return result;
-    }, {});
+    }, {} as Record<string, unknown>);
 }
 
-const props = defineProps({
-    src: {
-        type: String,
-        required: true,
-    },
-    title: {
-        type: String,
-        default: undefined,
-    },
-    transformSource: {
-        type: Function,
-        default: (svg) => svg,
-    },
-    keepDuringLoading: {
-        type: Boolean,
-        default: true,
-    },
+interface Props {
+    src: string;
+    title?: string;
+    transformSource?: (svg: SVGElement) => SVGElement;
+    keepDuringLoading?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    title: undefined,
+    transformSource: (svg: SVGElement) => svg,
+    keepDuringLoading: true,
 });
 
-const emit = defineEmits(['loaded', 'unloaded', 'error']);
+const emit = defineEmits<{
+    loaded: [svg: SVGElement | null];
+    unloaded: [];
+    error: [error: Error];
+}>();
 
 const attrs = useAttrs();
 
-/** @type {Ref <SVGElement>} */
-const svgElSource = ref();
-/** @type {Ref <XMLHttpRequest>} */
-const requestStored = ref();
+/** @type {Ref<SVGElement>} */
+const svgElSource = ref<SVGElement>();
+/** @type {Ref<XMLHttpRequest>} */
+const requestStored = ref<XMLHttpRequest>();
 
 defineExpose({
     svgElSource,
@@ -65,11 +63,11 @@ getSource(props.src);
 
 /**
  * @param {SVGElement} svgEl
- * @return {Record < string, string>|object}
+ * @return {Record<string, string>|object}
  */
-function getSvgAttrs(svgEl) {
+function getSvgAttrs(svgEl: SVGElement): Record<string, string> {
     // copy attrs
-    let svgAttrs = {};
+    let svgAttrs: Record<string, string> = {};
     const attrs = svgEl.attributes;
     if (!attrs) {
         return svgAttrs;
@@ -84,8 +82,8 @@ function getSvgAttrs(svgEl) {
  * @param {SVGElement} svgEl
  * @return {string}
  */
-function getSvgContent(svgEl) {
-    svgEl = /** @type {SVGElement}} */ (svgEl.cloneNode(true));
+function getSvgContent(svgEl: SVGElement): string {
+    svgEl = /** @type {SVGElement}} */ (svgEl.cloneNode(true) as SVGElement);
     svgEl = props.transformSource(svgEl);
     if (props.title) {
         setTitle(svgEl, props.title);
@@ -99,7 +97,7 @@ function getSvgContent(svgEl) {
  * Get svgElSource
  * @param {string} src
  */
-function getSource(src) {
+function getSource(src: string): void {
     // fill cache by src with promise
     if (!cache[src]) {
         // download
@@ -115,14 +113,14 @@ function getSource(src) {
     // inline svg when cached promise resolves
     cache[src]
         .then((svg) => {
-            svgElSource.value = svg;
+            svgElSource.value = svg as SVGElement;
             // wait to render
             nextTick(() => {
                 // notify
                 emit('loaded', document.querySelector('svg'));
             });
         })
-        .catch((err) => {
+        .catch((err: Error) => {
             // notify svg is unloaded
             if (svgElSource.value) {
                 svgElSource.value = undefined;
@@ -137,9 +135,9 @@ function getSource(src) {
 /**
  * Get the contents of the SVG
  * @param {string} url
- * @returns {PromiseWithState < Element >}
+ * @returns {PromiseWithState<Element>}
  */
-function download(url) {
+function download(url: string): PromiseWithState<Element> {
     return makePromiseState(new Promise((resolve, reject) => {
         const request = new XMLHttpRequest();
         request.open('GET', url, true);
@@ -153,7 +151,6 @@ function download(url) {
                     const result = parser.parseFromString(request.responseText, 'text/xml');
                     let svgEl = result.getElementsByTagName('svg')[0];
                     if (svgEl) {
-                        // svgEl = this.transformSource(svgEl);
                         resolve(svgEl);
                     } else {
                         reject(new Error('Loaded file is not valid SVG"'));
@@ -191,11 +188,11 @@ const render = () => {
 };
 
 /**
- * Create or edit the <title> element of a SVG
+ * Create or edit the <title> element of an SVG
  * @param {SVGElement} svg
  * @param {string} title
  */
-function setTitle(svg, title) {
+function setTitle(svg: SVGElement, title: string): void {
     const titleTags = svg.getElementsByTagName('title');
     if (titleTags.length) { // overwrite existing title
         titleTags[0].textContent = title;
@@ -207,11 +204,13 @@ function setTitle(svg, title) {
     }
 }
 
-/**
- * @typedef {Promise & object} PromiseWithState
- * @property {function: boolean} getIsPending
- * @template T
- */
+interface PromiseWithState<T> extends Promise<T> {
+    getIsPending: () => boolean;
+}
+
+function isPromiseWithState<T>(promise: Promise<T> | PromiseWithState<T>): promise is PromiseWithState<T> {
+    return promise['getIsPending'] !== undefined;
+}
 
 /**
  * This function allow you to modify a JS Promise by adding some status properties.
@@ -219,9 +218,11 @@ function setTitle(svg, title) {
  * @param {Promise<T>|PromiseWithState<T>} promise
  * @return {PromiseWithState<T>}
  */
-function makePromiseState(promise) {
+function makePromiseState<T>(promise: Promise<T> | PromiseWithState<T>): PromiseWithState<T> {
     // Don't modify any promise that has been already modified.
-    if (promise.getIsPending) return promise;
+    if (isPromiseWithState(promise)) {
+        return promise;
+    }
 
     // Set initial state
     let isPending = true;
@@ -236,7 +237,7 @@ function makePromiseState(promise) {
             isPending = false;
             throw e;
         },
-    );
+    ) as PromiseWithState<T>;
 
     result.getIsPending = function getIsPending() {
         return isPending;

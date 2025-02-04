@@ -7,10 +7,9 @@
     ".": {
       "module": "./dist/vue-inline-svg.mjs",
       "import": "./dist/vue-inline-svg.mjs",
-      "types": "./types/index.d.ts",
+      "types": "./types/InlineSvg.vue.d.ts",
       "default": "./dist/vue-inline-svg.js"
     },
-    "./InlineSvg": "./src/InlineSvg.vue",
     "./InlineSvg.vue": "./src/InlineSvg.vue",
     "./*": "./*"
   },
@@ -28,10 +27,8 @@
     "build": "rollup -c rollup.conf.js",
     "emit-dts": "vue-tsc -p tsconfig.dts.json",
     "test": "npm run lint && npm run test:ts && npm run test:vitest",
-    "test:ts": "npm run test:prepare && vue-tsc -p .",
-    "test:dts": "npm run test:prepare && check-dts test/*.types.ts",
+    "test:ts": "vue-tsc -p .",
     "test:vitest": "vitest run",
-    "test:prepare": "npm i vue@3 --no-save",
     "lint": "eslint . --no-error-on-unmatched-pattern --no-warn-ignored",
     "lint:fix": "npm run lint -- --fix",
     "prepublishOnly": "npm run test && npm run emit-dts && npm run build",
@@ -66,7 +63,6 @@
     "@rollup/plugin-terser": "^0.4.4",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/test-utils": "^2.4.6",
-    "check-dts": "^0.8.2",
     "eslint": "^9.19.0",
     "eslint-plugin-vue": "^9.32.0",
     "globals": "^15.14.0",
@@ -76,6 +72,7 @@
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.22.0",
     "vitest": "^3.0.5",
+    "vue": "^3.5.13",
     "vue-tsc": "^2.2.0"
   }
 }
