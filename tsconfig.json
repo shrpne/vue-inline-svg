@@ -17,6 +17,7 @@
 //    "sourceMap": true,
     "strict": false,
     "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
     "noEmit": true,
     "declaration": true,
     "declarationDir": "./types",
