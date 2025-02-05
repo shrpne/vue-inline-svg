@@ -3,55 +3,60 @@ import { nextTick } from 'vue';
 import { describe, it, beforeEach, afterEach, expect, vi } from 'vitest';
 import InlineSvg from '../src/InlineSvg.vue';
 
-
-const svgContentMap = {
-    'test.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40"/></svg>',
-    'rect.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="50" y="50" width="100" height="100"/></svg>',
-    'poly.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150"><polygon points="75,20 150,130 0,130"/></svg>',
-};
-
-class MockXMLHttpRequest {
-    static callCount: number = 0;
-    static loadXhrWithDelay = false;
-    constructor() {
-        MockXMLHttpRequest.callCount += 1;
-    }
-    onload() {};
-    onerror() {};
-    status: number = 200;
-    url: string = '';
-    responseText: string = '';
-
-    open(_method: string, url: string): void {
-        this.url = url;
-    }
-
-    send(): void {
-        if (MockXMLHttpRequest.loadXhrWithDelay) {
-            setTimeout(() => this._loadResponse(), 500);
-        } else {
-            this._loadResponse();
-        }
-    }
-
-    _loadResponse(): void {
-        const [path, query] = this.url.split('?');
-        if (svgContentMap[path]) {
-            this.responseText = svgContentMap[path];
-            this.status = 200;
-        } else {
-            // this.responseText = 'Not Found';
-            this.status = 404;
-        }
-        if (this.status === 200) {
-            this.onload?.();
-        } else {
-            this.onerror?.();
-        }
-    }
-}
-
 describe('InlineSvg', () => {
+    const svgContentMap = {
+        'test.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="red"><circle cx="50" cy="50" r="40"/></svg>',
+        'rect.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="50" y="50" width="100" height="100"/></svg>',
+        'poly.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150"><polygon points="75,20 150,130 0,130"/></svg>',
+    };
+
+    class MockXMLHttpRequest {
+        static callCount: number = 0;
+        static loadXhrWithDelay = false;
+
+        constructor() {
+            MockXMLHttpRequest.callCount += 1;
+        }
+
+        onload() {
+        };
+
+        onerror() {
+        };
+
+        status: number = 200;
+        url: string = '';
+        responseText: string = '';
+
+        open(_method: string, url: string): void {
+            this.url = url;
+        }
+
+        send(): void {
+            if (MockXMLHttpRequest.loadXhrWithDelay) {
+                setTimeout(() => this._loadResponse(), 500);
+            } else {
+                this._loadResponse();
+            }
+        }
+
+        _loadResponse(): void {
+            const [path, query] = this.url.split('?');
+            if (svgContentMap[path]) {
+                this.responseText = svgContentMap[path];
+                this.status = 200;
+            } else {
+                // this.responseText = 'Not Found';
+                this.status = 404;
+            }
+            if (this.status === 200) {
+                this.onload?.();
+            } else {
+                this.onerror?.();
+            }
+        }
+    }
+
     vi.stubGlobal('XMLHttpRequest', MockXMLHttpRequest);
 
     vi.stubGlobal('DOMParser', function() {
@@ -65,10 +70,7 @@ describe('InlineSvg', () => {
     });
 
     beforeEach((ctx) => {
-        console.log('TITLE:', ctx.task.name);
-
         // reset
-        console.log('loadXhrWithDelay = false');
         MockXMLHttpRequest.loadXhrWithDelay = false;
     });
 
@@ -202,6 +204,10 @@ describe('InlineSvg', () => {
                 height: '200',
                 'data-test': 'test-value',
                 viewBox: '0 0 200 200', // This should override the original viewBox
+                // falsy
+                color: false,
+                fill: null,
+
             },
         });
 
@@ -214,8 +220,31 @@ describe('InlineSvg', () => {
         expect(svg.attributes('height')).toBe('200');
         expect(svg.attributes('data-test')).toBe('test-value');
         expect(svg.attributes('viewBox')).toBe('0 0 200 200');
-        // Ensure original SVG attributes are preserved when not overridden
-        expect(svg.attributes('xmlns')).toBe('http://www.w3.org/2000/svg');
+        expect(svg.attributes('color')).toBeUndefined(); // falsy not applies
+        expect(svg.attributes('fill')).toBe('red'); // falsy not overrides
+        expect(svg.attributes('xmlns')).toBe('http://www.w3.org/2000/svg'); // original preserved
+    });
+
+    it('correctly merges style attributes with root SVG element', async () => {
+        svgContentMap['style-test.svg'] = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" style="stroke: green; stroke-opacity: 0.5"><circle cx="50" cy="50" r="40"/></svg>';
+
+        const wrapper = mount(InlineSvg, {
+            props: {
+                src: 'style-test.svg',
+            },
+            attrs: {
+                style: {
+                    stroke: "red",
+                },
+            },
+        });
+
+        await waitForSvgLoad();
+
+        const svg = wrapper.find('svg');
+        expect(svg.exists()).toBe(true);
+        expect(svg.attributes('style')).toContain('stroke-opacity: 0.5');
+        expect(svg.attributes('style')).toContain('stroke: red');
     });
 
     it('handles keepDuringLoading prop correctly', async () => {
@@ -228,12 +257,10 @@ describe('InlineSvg', () => {
 
         await waitForSvgLoad();
 
-        console.log('loadXhrWithDelay = true');
         MockXMLHttpRequest.loadXhrWithDelay = true;
         // Change src to trigger a new load (with cache-bust query)
         await wrapper.setProps({ src: 'poly.svg?' + Math.random()  });
         await nextTick();
-        console.log('check', wrapper.html(), wrapper.find('svg').exists());
 
         // Verify SVG is removed and unloaded event is emitted
         expect(wrapper.find('svg').exists()).toBe(false);

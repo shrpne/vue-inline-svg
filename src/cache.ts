@@ -1,5 +1,5 @@
-/** @type {Record<string, PromiseWithState<Element>>} */
-export const cache: Record<string, PromiseWithState<Element>> = {};
+/** @type {Record<string, PromiseWithState<SVGSVGElement>>} */
+export const cache: Record<string, PromiseWithState<SVGSVGElement>> = {};
 
 export interface PromiseWithState<T> extends Promise<T> {
     getIsPending: () => boolean;

@@ -1,23 +1,15 @@
 <script setup lang="ts">
 import { h as createElement, ref, watch, nextTick, useAttrs } from "vue";
 import {cache, makePromiseState, type PromiseWithState} from "./cache.ts";
+import { mergeAttrs } from './utils.ts';
 
 /**
  * @import { Ref } from 'vue';
  */
 
-/**
- * Remove false attrs
- * @param {Object} attrs
- */
-function filterAttrs(attrs: Record<string, unknown>): Record<string, unknown> {
-    return Object.keys(attrs).reduce((result, key) => {
-        if (attrs[key] !== false && attrs[key] !== null && attrs[key] !== undefined) {
-            result[key] = attrs[key];
-        }
-        return result;
-    }, {} as Record<string, unknown>);
-}
+defineOptions({
+    inheritAttrs: false,
+});
 
 interface Props {
     src: string;
@@ -66,23 +58,6 @@ getSource(props.src);
 
 /**
  * @param {SVGElement} svgEl
- * @return {Record<string, string>|object}
- */
-function getSvgAttrs(svgEl: SVGElement): Record<string, string> {
-    // copy attrs
-    let svgAttrs: Record<string, string> = {};
-    const attrs = svgEl.attributes;
-    if (!attrs) {
-        return svgAttrs;
-    }
-    for (let i = attrs.length - 1; i >= 0; i--) {
-        svgAttrs[attrs[i].name] = attrs[i].value;
-    }
-    return svgAttrs;
-}
-
-/**
- * @param {SVGElement} svgEl
  * @return {string}
  */
 function getSvgContent(svgEl: SVGElement): string {
@@ -120,7 +95,7 @@ function getSource(src: string): void {
     // inline svg when cached promise resolves
     cache[src]
         .then((svg) => {
-            svgElSource.value = svg as SVGElement;
+            svgElSource.value = svg;
             // wait to render
             nextTick(() => {
                 // notify
@@ -144,7 +119,7 @@ function getSource(src: string): void {
  * @param {string} url
  * @returns {PromiseWithState<Element>}
  */
-function download(url: string): PromiseWithState<Element> {
+function download(url: string): PromiseWithState<SVGSVGElement> {
     return makePromiseState(new Promise((resolve, reject) => {
         const request = new XMLHttpRequest();
         request.open('GET', url, true);
@@ -175,6 +150,7 @@ function download(url: string): PromiseWithState<Element> {
     }));
 }
 
+
 const render = () => {
     if (!svgElSource.value) {
         return null;
@@ -182,15 +158,10 @@ const render = () => {
 
     return createElement(
         'svg',
-        Object.assign(
-            {},
-            // source attrs
-            getSvgAttrs(svgElSource.value),
-            // component attrs and listeners
-            filterAttrs(attrs),
-            // content
-            { innerHTML: getSvgContent(svgElSource.value) },
-        ),
+        {
+            ...mergeAttrs(svgElSource.value, attrs),
+            innerHTML: getSvgContent(svgElSource.value),
+        },
     );
 };
 
@@ -259,4 +230,10 @@ function setUniqueIds(
     <render/>
 </template>
 
-<!--<svg v-if="svgElSource" v-bind="filterAttrs($attrs)" v-bind="getSvgAttrs(svgElSource)" v-html="getSvgContent(svgElSource)"/>-->
+<!-- saving some few by using render function instead
+<svg
+    v-if="svgElSource"
+    v-bind="getFinalAttrs()"
+    v-html="getSvgContent(svgElSource)"
+/>
+-->
