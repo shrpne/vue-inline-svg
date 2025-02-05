@@ -126,7 +126,7 @@ Type: `string`
 Sets/overwrites the `<title>` of the SVG
 
 ```html
-<inline-svg :src="image.svg" title="My Image"/>
+<inline-svg src="image.svg" title="My Image"/>
 ```
 
 
@@ -136,8 +136,8 @@ Type: `boolean | string`
 Add suffix to all IDs in SVG to eliminate conflicts for multiple SVGs with the same source. If `true` - suffix is random string, if `string` - suffix is this string.
 
 ```html
-<inline-svg :src="image.svg" :uniqueIds="true"/>
-<inline-svg :src="image.svg" uniqueIds="my-unique-suffix"/>
+<inline-svg src="image.svg" :uniqueIds="true"/>
+<inline-svg src="image.svg" uniqueIds="my-unique-suffix"/>
 ```
 
 
@@ -147,7 +147,7 @@ Type: `string`
 An URL to prefix each ID in case you use the `<base>` tag and `uniqueIds`.
 
 ```html
-<inline-svg :src="image.svg" :uniqueIds="true" uniqueIdsBase="http://example.com""/>
+<inline-svg src="image.svg" :uniqueIds="true" uniqueIdsBase="http://example.com""/>
 ```
 
 
@@ -157,7 +157,7 @@ Type: `boolean`; Default: `true`
 It makes vue-inline-svg to preserve old image visible, when new image is being loaded. Pass `false` to disable it and show nothing during loading.
 
 ```html
-<inline-svg :src="image.svg" :keepDuringLoading="false"/>
+<inline-svg src="image.svg" :keepDuringLoading="false"/>
 ```
 
 
@@ -168,7 +168,7 @@ Function to transform SVG content
 
 This example create circle in svg:
 ```html
-<inline-svg :src="image.svg" :transformSource="transform"/>
+<inline-svg src="image.svg" :transformSource="transform"/>
 
 <script>
 const transform = (svg) => {
@@ -219,6 +219,35 @@ Called when SVG failed to load.
 Error object passed as argument into the listener’s callback function.
 ```html
 <inline-svg @error="log($event)"/>
+```
+
+## 🛡️ Security Considerations
+
+Inlining SVGs directly into the DOM provides flexibility for styling and interaction. However, it can pose risks of XSS (Cross-Site Scripting) attacks. SVGs can contain JavaScript (`<script>` tags), event handlers (`onload`, `onclick`, etc.), or external references (`<use xlink:href="..."`), which could be exploited.
+
+To ensure security, follow these guidelines based on your SVG source:
+
+### 1️⃣ SVGs from your project assets
+Manually check they don't contain any harmful elements or attributes (scripts, event handlers, external references)
+
+### 2️⃣ SVGs from third-party sources or user-generated content
+
+Always sanitize before inlining. Use [DOMPurify](https://github.com/cure53/DOMPurify)
+
+```html
+<inline-svg
+    src="https://example.com/external.svg"
+    :transformSource="sanitize"
+/>
+
+<script>
+    import DOMPurify from 'dompurify';
+
+    function sanitize(svg) {
+        svg.innerHTML = DOMPurify.sanitize(svg.innerHTML, { USE_PROFILES: { svg: true } });
+        return svg;
+    }
+</script>
 ```
 
 ## Comparison

@@ -66,6 +66,7 @@ const config = [
 
             'vue/html-closing-bracket-spacing': 0,
             'vue/html-indent': ['error', 4],
+            'vue/no-v-html': 0,
         },
     },
 ];

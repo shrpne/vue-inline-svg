@@ -1,15 +1,13 @@
 {
   "name": "vue-inline-svg",
-  "version": "3.1.4",
+  "version": "4.0.0",
   "description": "Replace SVG images with inline SVG element",
   "type": "module",
   "exports": {
     ".": {
-      "module": "./dist/vue-inline-svg.esm.js",
-      "import": "./dist/vue-inline-svg.esm.js",
-      "require": "./dist/vue-inline-svg.cjs",
       "types": "./types/InlineSvg.vue.d.ts",
-      "default": "./dist/vue-inline-svg.js"
+      "import": "./dist/vue-inline-svg.esm.js",
+      "require": "./dist/vue-inline-svg.cjs"
     },
     "./InlineSvg.vue": "./src/InlineSvg.vue",
     "./*": "./*"
