@@ -32,6 +32,9 @@ Check old version [vue-inline-svg@2](https://github.com/shrpne/vue-inline-svg/tr
     - [loaded](#--loaded)
     - [unloaded](#--unloaded)
     - [error](#--error)
+- [Security Considerations](#-security-considerations)
+  - [SVGs from your project assets](#1-svgs-from-your-project-assets)
+  - [SVGs from third-party sources](#2-svgs-from-third-party-sources-or-user-generated-content)
 - [Comparison](#comparison)
 - [Changelog](#changelog)
 - [Contributing](#contributing)
@@ -110,13 +113,20 @@ Path to SVG file
 <inline-svg src="/my.svg"/>
 ```
 
-Note: if you use vue-loader assets or vue-cli, then paths like '../assets/my.svg' will not be handled by file-loader automatically like vue-cli do for `<img>` tag, so you will need to use it with `require`:
+ℹ️ **Note**: if you are using assets not from `public` directory, then you will need to import them with your bundler.
+
+**Webpack**: vue-loader or vue-cli will not handle paths like '../assets/my.svg' by file-loader automatically (like vue-cli do for `<img>` tag), so you will need to use it with `require()`:
+
+**Vite**: You might like [vite-plugin-require](https://www.npmjs.com/package/vite-plugin-require) to enable `require()` in Vite.
+
 ```html
 <inline-svg :src="require('../assets/my.svg')"/>
 ```
-Learn more:
+
+
+Learn more about static assets handling:
 - vite: https://vite.dev/guide/assets.html
-- vue-loader: https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
+- webpack's vue-loader: https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
 - vue-cli: https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
 
 
@@ -254,7 +264,8 @@ Always sanitize before inlining. Use [DOMPurify](https://github.com/cure53/DOMPu
 
 - This module: [![Minified Size](https://img.shields.io/bundlephobia/min/vue-inline-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-inline-svg)
 - [vue-simple-svg](https://github.com/seiyable/vue-simple-svg): [![Minified Size](https://img.shields.io/bundlephobia/min/vue-simple-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-simple-svg), does not cache network requests, has wrapper around svg, attrs passed to `<svg>` are limited, converts `<style>` tag into `style=""` attr
-- [svg-loader](https://github.com/visualfanatic/vue-svg-loader) uses different approach, it inlines SVG during compilation. It has pros that SVG is prerendered and no http request needed. But also it has cons that markup size grows, especially if you have same image repeated several times. (Discussed in [#11](https://github.com/shrpne/vue-inline-svg/issues/11))
+- [vite-svg-loader](https://www.npmjs.com/package/vite-svg-loader), webpack's [vue-svg-loader](https://github.com/visualfanatic/vue-svg-loader). They use different approach, they inline SVG during compilation. It has pros that SVG is bundled and no http request needed. But also it has cons that bundle size grows (or markup size if prerendered,
+  especially if you have same image repeated several times). (Discussed in [#11](https://github.com/shrpne/vue-inline-svg/issues/11))
 
 
 ## Changelog
