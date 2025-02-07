@@ -58,7 +58,7 @@ jobs:
                     COMPARE_URL="https://github.com/${{ github.repository }}/compare/${PREV_TAG}...${TAG_NAME}"
                     CHANGELOG_URL="https://github.com/${{ github.repository }}/blob/master/CHANGELOG.md"
 
-                    echo "[${PREV_TAG}...${TAG_NAME}]($COMPARE_URL)**" > release_notes.md
+                    echo "[${PREV_TAG}...${TAG_NAME}]($COMPARE_URL)" > release_notes.md
                     echo "" >> release_notes.md
                     echo "[Full changelog]($CHANGELOG_URL)" >> release_notes.md
 
