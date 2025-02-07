@@ -29,18 +29,24 @@ jobs:
                     fi
                     echo "tag=$TAG_NAME" >> $GITHUB_ENV
 
-            -   name: Get previous tag
+            -   name: Get previous tag (SemVer sorting)
                 id: previous_tag
                 run: |
-                    TAGS=($(git tag --sort=-creatordate))
+                    # Get all tags and sort them by SemVer (ignoring "v" prefix)
+                    TAGS=($(git tag -l | sort -V))
+
+                    # Get the current tag
                     CURRENT="${{ env.tag }}"
                     PREV=""
+
+                    # Loop through sorted tags to find the previous one
                     for i in "${!TAGS[@]}"; do
-                      if [[ "${TAGS[i]}" == "$CURRENT" && $i -lt $((${#TAGS[@]} - 1)) ]]; then
-                        PREV="${TAGS[i+1]}"
+                      if [[ "${TAGS[i]}" == "$CURRENT" && $i -gt 0 ]]; then
+                        PREV="${TAGS[i-1]}"
                         break
                       fi
                     done
+
                     echo "previous=$PREV" >> $GITHUB_ENV
 
             -   name: Create GitHub Release
