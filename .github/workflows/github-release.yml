@@ -3,8 +3,12 @@ name: Create Release
 on:
     push:
         tags:
-            - 'v*'  # Runs automatically when a new tag is pushed
-    workflow_dispatch:  # Allows manual runs
+            - 'v*'  # Auto-runs when a tag is pushed
+    workflow_dispatch:
+        inputs:
+            tag:
+                description: "Tag to create a release for"
+                required: true
 
 jobs:
     release:
@@ -13,13 +17,23 @@ jobs:
             -   name: Checkout repository
                 uses: actions/checkout@v4
                 with:
-                    fetch-depth: 0  # Ensure all tags are available
+                    fetch-depth: 0  # Fetch all tags
+
+            -   name: Determine tag
+                id: tag
+                run: |
+                    if [ -z "${{ github.event.inputs.tag }}" ]; then
+                      TAG_NAME=${{ github.ref_name }}
+                    else
+                      TAG_NAME=${{ github.event.inputs.tag }}
+                    fi
+                    echo "tag=$TAG_NAME" >> $GITHUB_ENV
 
             -   name: Get previous tag
                 id: previous_tag
                 run: |
                     TAGS=($(git tag --sort=-creatordate))
-                    CURRENT="${{ github.ref_name }}"
+                    CURRENT="${{ env.tag }}"
                     PREV=""
                     for i in "${!TAGS[@]}"; do
                       if [[ "${TAGS[i]}" == "$CURRENT" && $i -lt $((${#TAGS[@]} - 1)) ]]; then
@@ -33,7 +47,7 @@ jobs:
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 run: |
-                    TAG_NAME=${{ github.ref_name }}
+                    TAG_NAME=${{ env.tag }}
                     PREV_TAG=${{ env.previous }}
 
                     if [[ -z "$PREV_TAG" ]]; then
