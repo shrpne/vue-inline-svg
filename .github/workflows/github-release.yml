@@ -1,4 +1,4 @@
-name: Create Release
+name: Create and publish GitHub release
 
 on:
     push:
@@ -11,7 +11,7 @@ on:
                 required: true
 
 jobs:
-    release:
+    create-and-publish-gh-release:
         runs-on: ubuntu-latest
         steps:
             -   name: Checkout repository
