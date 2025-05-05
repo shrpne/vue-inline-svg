@@ -38,6 +38,7 @@ const attrs = useAttrs();
 
 /** @type {Ref<SVGElement>} */
 const svgElSource = ref<SVGElement>();
+const svgRendered = ref<SVGElement>();
 /** @type {Ref<XMLHttpRequest>} */
 const requestStored = ref<XMLHttpRequest>();
 const uniqueIdHash = Math.random().toString(36).substring(2);
@@ -99,7 +100,7 @@ function getSource(src: string): void {
             // wait to render
             nextTick(() => {
                 // notify
-                emit('loaded', document.querySelector('svg'));
+                emit('loaded', svgRendered.value);
             });
         })
         .catch((err: Error) => {
@@ -161,6 +162,7 @@ const render = () => {
         {
             ...mergeAttrs(svgElSource.value, attrs),
             innerHTML: getSvgContent(svgElSource.value),
+            ref: svgRendered,
         },
     );
 };

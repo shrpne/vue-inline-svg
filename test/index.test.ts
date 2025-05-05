@@ -130,6 +130,47 @@ describe('InlineSvg', () => {
         expect(emitted).toHaveProperty('loaded');
     });
 
+    it('emits different DOM elements for multiple InlineSvg components', async () => {
+        // Mount first component
+        const wrapper1 = mount(InlineSvg, {
+            props: {
+                src: 'test.svg',
+            },
+        });
+        await waitForSvgLoad();
+        const emitted1 = wrapper1.emitted('loaded')[0][0] as SVGElement;
+
+        // Mount second component
+        const wrapper2 = mount(InlineSvg, {
+            props: {
+                src: 'test.svg',
+            },
+        });
+        await waitForSvgLoad();
+        const emitted2 = wrapper2.emitted('loaded')[0][0] as SVGElement;
+
+        // Mount third component
+        const wrapper3 = mount(InlineSvg, {
+            props: {
+                src: 'rect.svg',
+            },
+        });
+        await waitForSvgLoad();
+        const emitted3 = wrapper3.emitted('loaded')[0][0] as SVGElement;
+
+
+        // 1st and 2nd emitted have same html
+        expect(emitted1.innerHTML).toEqual(emitted2.innerHTML);
+        // 1st and 2nd emitted are different references
+        expect(emitted1).not.toBe(emitted2);
+        // Both should be valid SVG elements
+        expect(emitted1 instanceof SVGElement).toBe(true);
+        expect(emitted2 instanceof SVGElement).toBe(true);
+        // 2st and 3nd emitted have different html
+        expect(emitted2.innerHTML).not.toEqual(emitted3.innerHTML);
+    });
+
+
     it('emits error event on SVG load failure', async () => {
         const wrapper = mount(InlineSvg, {
             props: {

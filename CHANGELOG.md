@@ -1,8 +1,11 @@
+## 4.0.1 - 2025-05-05
+- Fix: @loaded was emitting the same first DOM element for multiple InlineSvg components
+
 ## 4.0.0 - 2025-02-05
 - Add: `uniqueIds` prop
 - Fix: merges inline styles on root svg properly now
 - Refactored to Vue SFC's script setup and typescript
-- Types now generating automatically
+- Types are generating automatically now
 - **BREAKING** changed internal file paths
 
 ## 3.1.4 - 2024-09-17
