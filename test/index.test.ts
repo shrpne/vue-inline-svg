@@ -201,6 +201,47 @@ describe('InlineSvg', () => {
         expect(wrapper.find('path').exists()).toBe(true);
     });
 
+    it('updates SVG when transformSource prop changes', async () => {
+        // Initial transform function
+        const initialTransform = vi.fn((svg: SVGElement) => {
+            const rect = document.createElement('rect');
+            svg.appendChild(rect);
+            return svg;
+        });
+
+        // Mount component with initial transform
+        const wrapper = mount(InlineSvg, {
+            props: {
+                src: 'test.svg',
+                transformSource: initialTransform,
+            },
+        });
+        await waitForSvgLoad();
+
+        // Verify initial transform was applied
+        expect(wrapper.find('rect').exists()).toBe(true);
+        expect(initialTransform).toHaveBeenCalled();
+
+        // New transform function
+        const newTransform = vi.fn((svg: SVGElement) => {
+            const circle = document.createElement('circle');
+            svg.appendChild(circle);
+            return svg;
+        });
+
+        // Update transform function
+        await wrapper.setProps({
+            transformSource: newTransform,
+        });
+        await waitForSvgLoad();
+
+        // Verify new transform was applied
+        expect(wrapper.find('circle').exists()).toBe(true);
+        expect(newTransform).toHaveBeenCalled();
+        expect(wrapper.find('rect').exists()).toBe(false);
+    });
+
+
     it('updates SVG when src prop changes', async () => {
         const wrapper = mount(InlineSvg, {
             props: {
