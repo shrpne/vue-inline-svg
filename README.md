@@ -49,7 +49,7 @@ Check old version [vue-inline-svg@2](https://github.com/shrpne/vue-inline-svg/tr
 npm install vue-inline-svg
 ```
 
-Register locally in your component
+#### Register locally in your component
 ```js
 import InlineSvg from 'vue-inline-svg';
 
@@ -61,7 +61,7 @@ export default {
 }
 ```
 
-Or register globally in the Vue app
+#### Or register globally in the Vue app
 ```js
 import { createApp } from 'vue'
 import InlineSvg from 'vue-inline-svg';
@@ -69,6 +69,8 @@ import InlineSvg from 'vue-inline-svg';
 const app = createApp({/*...*/});
 app.component('inline-svg', InlineSvg);
 ```
+Usually, registering components globally may be considered as bad practice, such it may pollute the main bundle, but since InlineSvg is a very small package and inlining icons may be needed throughout the whole app, registering globally may bring no to little
+downsides but improve DX
 
 
 ### CDN
@@ -103,34 +105,13 @@ app.component('inline-svg', VueInlineSvg);
 [Example](https://github.com/shrpne/vue-inline-svg/blob/master/demo/index.html)
 
 
-### props
-#### - `src`
-Type: `string` **Required**
+### Using relative paths or aliased paths
 
-Path to SVG file
-
-```html
-<InlineSvg src="/my.svg"/>
-```
-
-ℹ️ **Note**: if you are referencing assets with relative path (not from `public` directory), e.g. "./assets/my.svg", "@/assets/my.svg", then `@vitejs/plugin-vue` or `@vue/cli` will not handle them automatically like they do for `<img>` tag, so you will need to import them with your bundler or configure automatic handling.
+If you are referencing assets with relative path (not from `public` directory), e.g. "./assets/my.svg", "@/assets/my.svg", then `@vitejs/plugin-vue` or `@vue/cli` will not handle them automatically like they do for `<img>` tag, so you will need to manually import them with your bundler or configure automatic handling.
 
 
-##### Manual importing
-```html
-<!-- vite -->
-<script>
-    import imgUrl from '@/assets/img/my.svg';
-</script>
-<InlineSvg :src="imgUrl"/>
+#### Configuring automatic handling with `@vitejs/plugin-vue`
 
-<!-- webpack -->
-<InlineSvg :src="require('@/assets/img/my.svg')"/>
-```
-
-You might also like [vite-plugin-require](https://www.npmjs.com/package/vite-plugin-require) to enable `require()` in Vite.
-
-##### Configuring automatic handling with `@vitejs/plugin-vue`
 ```js
 // vite.config.js
 import { defineConfig } from 'vite';
@@ -162,10 +143,50 @@ export default defineConfig({
 <InlineSvg src="@/assets/img/my.svg"/>
 ```
 
-Learn more about static assets handling:
+
+#### Manual importing
+
+```html
+<!-- vite -->
+<script>
+    import imgUrl from '@/assets/img/my.svg';
+</script>
+<InlineSvg :src="imgUrl"/>
+
+<!-- webpack -->
+<InlineSvg :src="require('@/assets/img/my.svg')"/>
+```
+
+You might also like [vite-plugin-require](https://www.npmjs.com/package/vite-plugin-require) to enable `require()` in Vite.
+
+
+
+#### Learn more about static assets handling:
+
 - vite: https://vite.dev/guide/assets.html
 - vite plugin vue: https://github.com/vitejs/vite-plugin-vue/blob/main/packages/plugin-vue/README.md
 - webpack's vue-loader: https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
+
+
+### props
+#### - `src`
+Type: `string` **Required**
+
+Path to SVG file
+
+```html
+<!-- from /public folder -->
+<InlineSvg src="/my.svg"/>
+
+<!-- from relative path -->
+<InlineSvg src="./assets/img/my.svg"/>
+
+<!-- from aliased path -->
+<InlineSvg src="@/assets/img/my.svg"/>
+<InlineSvg src="~/assets/img/my.svg"/>
+```
+
+[Note on relative and aliased paths](#using-relative-paths-or-aliased-paths)
 
 
 #### - `title`
@@ -298,12 +319,17 @@ Always sanitize before inlining. Use [DOMPurify](https://github.com/cure53/DOMPu
 </script>
 ```
 
-## Comparison
+## Alternative approaches
 
-- This module: [![Minified Size](https://img.shields.io/bundlephobia/min/vue-inline-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-inline-svg)
-- [vue-simple-svg](https://github.com/seiyable/vue-simple-svg): [![Minified Size](https://img.shields.io/bundlephobia/min/vue-simple-svg.svg?style=flat-square)](https://bundlephobia.com/result?p=vue-simple-svg), does not cache network requests, has wrapper around svg, attrs passed to `<svg>` are limited, converts `<style>` tag into `style=""` attr
-- [vite-svg-loader](https://www.npmjs.com/package/vite-svg-loader), webpack's [vue-svg-loader](https://github.com/visualfanatic/vue-svg-loader). They use different approach, they inline SVG during compilation. It has pros that SVG is bundled and no http request needed. But also it has cons that bundle size grows (or markup size if prerendered,
-  especially if you have same image repeated several times). (Discussed in [#11](https://github.com/shrpne/vue-inline-svg/issues/11))
+- [vite-svg-loader](https://www.npmjs.com/package/vite-svg-loader), webpack's [vue-svg-loader](https://github.com/visualfanatic/vue-svg-loader). These tools embed SVG content directly into the JS bundle during compilation. **Pros**: SVG is bundled, eliminating the need for separate HTTP requests. **Cons**: Increased bundle size can delay the execution of more critical JS tasks. Additionally, each icon will be parsed multiple times: first as JS and then as HTML when inserted into the document (JS parsing is resource-intensive). Further reading on the [cons of SVG-in-JS](https://kurtextrem.de/posts/svg-in-js#performance-deep-dive-why-svg-in-js-is-an-anti-pattern)
+
+- The `<svg><use href="my.svg#icon1"/></svg>` approach requires no JS, that is great, but it has several disadvantages:
+  - may be not very convenient, it requires referencing IDs, updating SVG `fill`'s with `currentColor`. May be hard to manipulate other things except the main color. While DX can be improved with [@svg-use](https://fotis.xyz/posts/introducing-svg-use/)
+  - doesn't support cross-origin resources
+  - doesn't support embedded `<style>`, `<mask>`, `<clipPath>`, `<animate>`, `<animateMotion>`, `<animateTransform>` tags
+
+- inlining with `vue-inline-svg`. As cons, it requires some JS, but very little, only for the component itself. Icons are loaded separately from the JS bundle, so they are not available instantly after JS is loaded, but it can also be seen as an advantage, as it leads to faster JS bundle load. Inlining offers maximum flexibility on par with SVG-in-JS. Overall, it has excellent DX: if the component will be [registered globally](#or-register-globally-in-the-vue-app) and automatic asset handling will be [configured](#configuring-automatic-handling-with-vitejsplugin-vue), then usage will be as easy as a simple
+  `<img>`
 
 
 ## Changelog
