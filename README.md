@@ -88,7 +88,7 @@ app.component('inline-svg', VueInlineSvg);
 ## Usage
 
 ```html
-<inline-svg
+<InlineSvg
     src="image.svg"
     transformSource="transformSvg"
     @loaded="svgLoaded($event)"
@@ -98,7 +98,7 @@ app.component('inline-svg', VueInlineSvg);
     height="150"
     fill="black"
     aria-label="My image"
-></inline-svg>
+/>
 ```
 [Example](https://github.com/shrpne/vue-inline-svg/blob/master/demo/index.html)
 
@@ -110,24 +110,62 @@ Type: `string` **Required**
 Path to SVG file
 
 ```html
-<inline-svg src="/my.svg"/>
+<InlineSvg src="/my.svg"/>
 ```
 
-ℹ️ **Note**: if you are using assets not from `public` directory, then you will need to import them with your bundler.
+ℹ️ **Note**: if you are referencing assets with relative path (not from `public` directory), e.g. "./assets/my.svg", "@/assets/my.svg", then `@vitejs/plugin-vue` or `@vue/cli` will not handle them automatically like they do for `<img>` tag, so you will need to import them with your bundler or configure automatic handling.
 
-**Webpack**: vue-loader or vue-cli will not handle paths like '../assets/my.svg' by file-loader automatically (like vue-cli do for `<img>` tag), so you will need to use it with `require()`:
 
-**Vite**: You might like [vite-plugin-require](https://www.npmjs.com/package/vite-plugin-require) to enable `require()` in Vite.
+##### Manual importing
+```html
+<!-- vite -->
+<script>
+    import imgUrl from '@/assets/img/my.svg';
+</script>
+<InlineSvg :src="imgUrl"/>
+
+<!-- webpack -->
+<InlineSvg :src="require('@/assets/img/my.svg')"/>
+```
+
+You might also like [vite-plugin-require](https://www.npmjs.com/package/vite-plugin-require) to enable `require()` in Vite.
+
+##### Configuring automatic handling with `@vitejs/plugin-vue`
+```js
+// vite.config.js
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+
+export default defineConfig({
+    plugins: [
+        vue({
+            template: {
+                transformAssetUrls: {
+                    // default options
+                    video: ['src', 'poster'],
+                    source: ['src'],
+                    img: ['src'],
+                    image: ['xlink:href', 'href'],
+                    use: ['xlink:href', 'href'],
+                    // adding InlineSvg component with camel and kebab casing
+                    InlineSvg: ['src'],
+                    ['inline-svg']: ['src'],
+                },
+            },
+        }),
+    ],
+});
+```
 
 ```html
-<inline-svg :src="require('../assets/my.svg')"/>
+<!-- So this will work-->
+<InlineSvg src="@/assets/img/my.svg"/>
 ```
-
 
 Learn more about static assets handling:
 - vite: https://vite.dev/guide/assets.html
+- vite plugin vue: https://github.com/vitejs/vite-plugin-vue/blob/main/packages/plugin-vue/README.md
 - webpack's vue-loader: https://vue-loader.vuejs.org/guide/asset-url.html#transform-rules
-- vue-cli: https://cli.vuejs.org/guide/html-and-static-assets.html#static-assets-handling
 
 
 #### - `title`
@@ -136,7 +174,7 @@ Type: `string`
 Sets/overwrites the `<title>` of the SVG
 
 ```html
-<inline-svg src="image.svg" title="My Image"/>
+<InlineSvg src="image.svg" title="My Image"/>
 ```
 
 
@@ -146,8 +184,8 @@ Type: `boolean | string`
 Add suffix to all IDs in SVG to eliminate conflicts for multiple SVGs with the same source. If `true` - suffix is random string, if `string` - suffix is this string.
 
 ```html
-<inline-svg src="image.svg" :uniqueIds="true"/>
-<inline-svg src="image.svg" uniqueIds="my-unique-suffix"/>
+<InlineSvg src="image.svg" :uniqueIds="true"/>
+<InlineSvg src="image.svg" uniqueIds="my-unique-suffix"/>
 ```
 
 
@@ -157,7 +195,7 @@ Type: `string`
 An URL to prefix each ID in case you use the `<base>` tag and `uniqueIds`.
 
 ```html
-<inline-svg src="image.svg" :uniqueIds="true" uniqueIdsBase="http://example.com""/>
+<InlineSvg src="image.svg" :uniqueIds="true" uniqueIdsBase="http://example.com""/>
 ```
 
 
@@ -167,7 +205,7 @@ Type: `boolean`; Default: `true`
 It makes vue-inline-svg to preserve old image visible, when new image is being loaded. Pass `false` to disable it and show nothing during loading.
 
 ```html
-<inline-svg src="image.svg" :keepDuringLoading="false"/>
+<InlineSvg src="image.svg" :keepDuringLoading="false"/>
 ```
 
 
@@ -178,7 +216,7 @@ Function to transform SVG content
 
 This example create circle in svg:
 ```html
-<inline-svg src="image.svg" :transformSource="transform"/>
+<InlineSvg src="image.svg" :transformSource="transform"/>
 
 <script>
 const transform = (svg) => {
@@ -199,11 +237,11 @@ const transform = (svg) => {
 Other SVG and HTML attributes will be passed to inlined `<svg>`. Except attributes with `false` or `null` value.
 ```html
 <!-- input -->
-<inline-svg
+<InlineSvg
     fill-opacity="0.25"
     :stroke-opacity="myStrokeOpacity"
     :color="false"
-></inline-svg>
+/>
 
 <!-- output -->
 <svg fill-opacity="0.25" stroke-opacity="0.5"></svg>
@@ -215,20 +253,20 @@ Other SVG and HTML attributes will be passed to inlined `<svg>`. Except attribut
 Called when SVG image is loaded and inlined.
 Inlined SVG element passed as argument into the listener’s callback function.
 ```html
-<inline-svg @loaded="myInlinedSvg = $event"/>
+<InlineSvg @loaded="myInlinedSvg = $event"/>
 ```
 
 #### - `unloaded`
 Called when `src` prop was changed and another SVG start loading.
 ```html
-<inline-svg @unloaded="handleUnloaded()"/>
+<InlineSvg @unloaded="handleUnloaded()"/>
 ```
 
 #### - `error`
 Called when SVG failed to load.
 Error object passed as argument into the listener’s callback function.
 ```html
-<inline-svg @error="log($event)"/>
+<InlineSvg @error="log($event)"/>
 ```
 
 ## 🛡️ Security Considerations
@@ -245,7 +283,7 @@ Manually check they don't contain any harmful elements or attributes (scripts, e
 Always sanitize before inlining. Use [DOMPurify](https://github.com/cure53/DOMPurify)
 
 ```html
-<inline-svg
+<InlineSvg
     src="https://example.com/external.svg"
     :transformSource="sanitize"
 />
