@@ -8,6 +8,7 @@ describe('InlineSvg', () => {
         'test.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="red"><circle cx="50" cy="50" r="40"/></svg>',
         'rect.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect x="50" y="50" width="100" height="100"/></svg>',
         'poly.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 150"><polygon points="75,20 150,130 0,130"/></svg>',
+        'handler.svg': '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" onload="alert(1)"><circle cx="50" cy="50" r="40"/></svg>',
     };
 
     class MockXMLHttpRequest {
@@ -199,6 +200,28 @@ describe('InlineSvg', () => {
 
         expect(transformSource).toHaveBeenCalled();
         expect(wrapper.find('path').exists()).toBe(true);
+    });
+
+    it('applies transformSource to the root svg attributes', async () => {
+        const transformSource = (svg: SVGElement) => {
+            svg.removeAttribute('onload');
+            svg.setAttribute('data-transformed', 'true');
+            return svg;
+        };
+
+        const wrapper = mount(InlineSvg, {
+            props: {
+                src: 'handler.svg',
+                transformSource,
+            },
+        });
+
+        await waitForSvgLoad();
+
+        const svg = wrapper.find('svg');
+        expect(svg.attributes('onload')).toBeUndefined();
+        expect(svg.attributes('data-transformed')).toBe('true');
+        expect(wrapper.find('circle').exists()).toBe(true);
     });
 
     it('updates SVG when transformSource prop changes', async () => {

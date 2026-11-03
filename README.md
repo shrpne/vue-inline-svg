@@ -313,7 +313,8 @@ Always sanitize before inlining. Use [DOMPurify](https://github.com/cure53/DOMPu
     import DOMPurify from 'dompurify';
 
     function sanitize(svg) {
-        svg.innerHTML = DOMPurify.sanitize(svg.innerHTML, { USE_PROFILES: { svg: true } });
+        // sanitize the whole element, including attributes of the root <svg>
+        DOMPurify.sanitize(svg, { IN_PLACE: true, USE_PROFILES: { svg: true } });
         return svg;
     }
 </script>
