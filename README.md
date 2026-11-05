@@ -235,6 +235,9 @@ Type: `(svg: SVGElement) => SVGElement`
 
 Function to transform SVG content
 
+It receives a copy of the loaded `<svg>` element, so changes don't affect other components that use the same `src`.
+Both the content and the root attributes of the returned element are rendered (since v5). Attributes passed to the component take precedence over root attributes.
+
 This example create circle in svg:
 ```html
 <InlineSvg src="image.svg" :transformSource="transform"/>

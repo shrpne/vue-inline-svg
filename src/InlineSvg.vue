@@ -156,8 +156,6 @@ const render = () => {
         return null;
     }
 
-    // use the transformed svg for both the root attributes and the content,
-    // so transformSource (e.g. a sanitizer) also applies to the root element
     const svgEl = getTransformedSvg(svgElSource.value);
 
     return createElement(

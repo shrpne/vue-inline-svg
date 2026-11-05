@@ -224,6 +224,43 @@ describe('InlineSvg', () => {
         expect(wrapper.find('circle').exists()).toBe(true);
     });
 
+    it('does not leak root transforms into the shared cache', async () => {
+        const src = `handler.svg?${Math.random()}`;
+        MockXMLHttpRequest.callCount = 0;
+
+        const transformed = mount(InlineSvg, {
+            props: {
+                src,
+                transformSource: (svg: SVGElement) => {
+                    svg.removeAttribute('onload');
+                    svg.setAttribute('data-transformed', 'true');
+                    return svg;
+                },
+            },
+        });
+        await waitForSvgLoad();
+
+        const plain = mount(InlineSvg, {
+            props: {
+                src,
+            },
+        });
+        await waitForSvgLoad();
+
+        // same cached source for both instances
+        expect(MockXMLHttpRequest.callCount).toBe(1);
+        expect(plain.vm.svgElSource).toBe(transformed.vm.svgElSource);
+
+        // the cached source is untouched
+        expect(transformed.vm.svgElSource.getAttribute('onload')).toBe('alert(1)');
+        expect(transformed.vm.svgElSource.hasAttribute('data-transformed')).toBe(false);
+
+        // the instance without a transform renders the original root attributes
+        expect(transformed.find('svg').attributes('data-transformed')).toBe('true');
+        expect(plain.find('svg').attributes('data-transformed')).toBeUndefined();
+        expect(plain.find('svg').attributes('onload')).toBe('alert(1)');
+    });
+
     it('updates SVG when transformSource prop changes', async () => {
         // Initial transform function
         const initialTransform = vi.fn((svg: SVGElement) => {

@@ -1,3 +1,11 @@
+## 5.0.0 - 2026-11-05
+- **BREAKING** `transformSource` now applies to the attributes of the root `<svg>`, not only to its content (#70, #71). This reverses the 2.0.0 behaviour. The rendered root `<svg>` takes its attributes from the element `transformSource` returns, so:
+    - changes your transform makes to root attributes now show up in the output
+    - if your transform returns a different element than the one it received (a wrapper, a `<g>`, a new node), that element's attributes end up on the rendered `<svg>`, and attributes it lacks (like `viewBox`) are gone
+    - attributes passed to the component still take precedence over both
+- Fix: a sanitizer in `transformSource` can now remove event handlers (`onload` and similar) from the root `<svg>`. Before, the root attributes always came from the original file and could not be removed, not even by passing `null` on the component.
+- Docs: the DOMPurify example in Security Considerations now sanitizes the whole element (`IN_PLACE`), including root attributes
+
 ## 4.0.1 - 2025-05-05
 - Fix: @loaded was emitting the same first DOM element for multiple InlineSvg components
 
