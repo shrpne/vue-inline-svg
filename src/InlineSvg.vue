@@ -59,9 +59,9 @@ getSource(props.src);
 
 /**
  * @param {SVGElement} svgEl
- * @return {string}
+ * @return {SVGElement}
  */
-function getSvgContent(svgEl: SVGElement): string {
+function getTransformedSvg(svgEl: SVGElement): SVGElement {
     svgEl = /** @type {SVGElement}} */ (svgEl.cloneNode(true) as SVGElement);
     if (props.uniqueIds) {
         const hash = typeof props.uniqueIds === 'string' ? props.uniqueIds : uniqueIdHash;
@@ -72,8 +72,7 @@ function getSvgContent(svgEl: SVGElement): string {
         setTitle(svgEl, props.title);
     }
 
-    // copy inner html
-    return svgEl.innerHTML;
+    return svgEl;
 }
 
 /**
@@ -157,11 +156,15 @@ const render = () => {
         return null;
     }
 
+    // use the transformed svg for both the root attributes and the content,
+    // so transformSource (e.g. a sanitizer) also applies to the root element
+    const svgEl = getTransformedSvg(svgElSource.value);
+
     return createElement(
         'svg',
         {
-            ...mergeAttrs(svgElSource.value, attrs),
-            innerHTML: getSvgContent(svgElSource.value),
+            ...mergeAttrs(svgEl, attrs),
+            innerHTML: svgEl.innerHTML,
             ref: svgRendered,
         },
     );
